@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuto - ছুটো | ইউজার অ্যাপ</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts (Anek Bangla & Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', 'Anek Bangla', sans-serif;
+      background-color: #f3f4f6;
+    }
+    .mobile-shell {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    .app-page {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+    }
+    .app-page.active {
+      display: flex;
+      flex-direction: column;
+    }
+    .dash-tab-content {
+      display: none;
+      width: 100%;
+    }
+    .dash-tab-content.active {
+      display: block;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .shimmer {
+      background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-shell">
+
+    <!-- 0. SPLASH LOADING SCREEN (This is default active now to bypass account screen flash) -->
+    <div id="page-splash" class="app-page active justify-center items-center bg-white p-6">
+      <div class="text-center space-y-4">
+        <div class="relative w-16 h-16 rounded-2xl bg-teal-500 text-white flex items-center justify-center mx-auto shadow-md animate-bounce">
+          <i class="fa-solid fa-truck-fast text-3xl"></i>
+        </div>
+        <div class="space-y-1">
+          <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight">Chuto</h1>
+          <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">ছুটে যাবে আপনার দুয়ার</p>
+        </div>
+        <div class="pt-6">
+          <div class="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. ACCOUNT CREATION (REGISTRATION) - Default Inactive on startup -->
+    <div id="page-register" class="app-page p-6 justify-center bg-white">
+      <div class="w-full max-w-sm mx-auto space-y-5">
+        <div class="text-center space-y-1">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teal-50 text-teal-600 mb-1">
+            <i class="fa-solid fa-truck-fast text-2xl"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Chuto অ্যাকাউন্ট তৈরি</h1>
+          <p class="text-xs text-gray-400 font-medium">সহজ রাইড ও খাবার বুকিংয়ের জন্য তথ্য দিন</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex flex-col items-center justify-center">
+            <label for="reg-avatar" class="cursor-pointer relative group">
+              <div id="avatar-preview" class="w-16 h-16 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden hover:border-teal-500 transition-all duration-300">
+                <i class="fa-solid fa-camera text-gray-400 text-sm"></i>
+              </div>
+            </label>
+            <input type="file" id="reg-avatar" accept="image/*" class="hidden">
+            <span class="text-[10px] text-gray-400 mt-2 font-medium">ছবি যোগ করুন</span>
+          </div>
+
+          <div class="space-y-3.5 text-xs">
+            <div>
+              <label class="block text-gray-500 mb-1 font-semibold">আপনার নাম</label>
+              <input type="text" id="reg-name" placeholder="নাম" class="w-full px-3.5 py-3 border border-gray-200 rounded-xl focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-gray-500 mb-1 font-semibold">মোবাইল নাম্বার</label>
+              <input type="tel" id="reg-phone" placeholder="মোবাইল নাম্বার" class="w-full px-3.5 py-3 border border-gray-200 rounded-xl focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-gray-500 mb-1 font-semibold">পাসওয়ার্ড</label>
+              <input type="password" id="reg-password" placeholder="পাসওয়ার্ড" class="w-full px-3.5 py-3 border border-gray-200 rounded-xl focus:outline-none">
+            </div>
+
+            <!-- Granular Location -->
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3 mt-2 shadow-sm">
+              <p class="text-[11px] font-bold text-gray-600 border-b pb-1">ঠিকানা নির্ধারণ (বাউফল এলাকা)</p>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] text-gray-400 mb-1 font-semibold">জেলা</label>
+                  <select id="reg-district" class="w-full px-2 py-2 bg-white border border-gray-200 rounded-md focus:outline-none text-gray-600">
+                    <option value="Patuakhali">পটুয়াখালী</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-gray-400 mb-1 font-semibold">উপজেলা</label>
+                  <select id="reg-upazila" class="w-full px-2 py-2 bg-white border border-gray-200 rounded-md focus:outline-none text-gray-600">
+                    <option value="Bauphal">বাউফল</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-gray-400 mb-1 font-semibold">গ্রাম / ইউনিয়ন / মহল্লা</label>
+                <input type="text" id="reg-village" placeholder="গ্রাম বা ইউনিয়নের নাম" class="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-md focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button id="btn-register" class="w-full bg-teal-600 hover:bg-teal-700 active:scale-95 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-sm">নিবন্ধন সম্পন্ন করুন</button>
+          </div>
+          <div class="text-center pt-1">
+            <span class="text-xs text-gray-400">ইতিমধ্যে অ্যাকাউন্ট আছে? </span>
+            <button onclick="switchPage('page-login')" class="text-xs text-teal-600 font-bold hover:underline">লগইন করুন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. LOGIN PAGE -->
+    <div id="page-login" class="app-page p-6 justify-center bg-white">
+      <div class="w-full max-w-sm mx-auto space-y-6">
+        <div class="text-center space-y-1">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-teal-50 text-teal-600 mb-1">
+            <i class="fa-solid fa-lock text-xl"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-900">লগইন</h1>
+          <p class="text-xs text-gray-400">আপনার মোবাইল ও পাসওয়ার্ড দিন</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="space-y-3.5 text-xs">
+            <div>
+              <label class="block text-gray-500 mb-1 font-semibold">মোবাইল নাম্বার</label>
+              <input type="tel" id="login-phone" placeholder="মোবাইল নাম্বার" class="w-full px-3.5 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block text-gray-500 mb-1 font-semibold">পাসওয়ার্ড</label>
+              <input type="password" id="login-password" placeholder="পাসওয়ার্ড" class="w-full px-3.5 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button id="btn-login" class="w-full bg-teal-600 hover:bg-teal-700 active:scale-95 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">প্রবেশ করুন</button>
+          </div>
+          <div class="text-center pt-1">
+            <span class="text-xs text-gray-400">নতুন অ্যাকাউন্ট? </span>
+            <button onclick="switchPage('page-register')" class="text-xs text-teal-600 font-bold hover:underline">নতুন অ্যাকাউন্ট খুলুন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD WRAPPER -->
+    <div id="page-dashboard" class="app-page bg-white justify-between pb-16">
+      
+      <!-- Top Header -->
+      <header class="px-4 py-3.5 flex justify-between items-center border-b border-gray-50 sticky top-0 bg-white z-10 shadow-sm">
+        <div class="flex items-center space-x-1.5">
+          <i class="fa-solid fa-truck-fast text-teal-600 text-lg"></i>
+          <span class="font-extrabold text-lg text-gray-800 tracking-tight">Chuto</span>
+        </div>
+        <div onclick="switchDashTab('profile')" id="profile-trigger" class="w-8 h-8 rounded-full bg-teal-50 border border-teal-100 flex items-center justify-center cursor-pointer overflow-hidden text-xs font-semibold text-teal-700 transition hover:scale-105"></div>
+      </header>
+
+      <div class="flex-grow overflow-y-auto">
+
+        <!-- TAB-A: HOME CONTENT -->
+        <div id="tab-home" class="dash-tab-content active">
+          
+          <!-- Dynamic Banner Slider (Controlled by Admin Panel) -->
+          <div class="p-4" id="banner-slider-container">
+            <div class="bg-gradient-to-br from-teal-600 to-emerald-700 text-white p-5 rounded-2xl shadow-md flex items-center justify-between">
+              <div class="space-y-1">
+                <h2 class="text-base font-bold">Chuto — ছুটো</h2>
+                <p class="text-[10px] text-teal-100 font-medium">রাইড কিংবা খাবার, ছুটে যাবে আপনার দুয়ার</p>
+              </div>
+              <span class="inline-block bg-white/15 text-[9px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-location-dot mr-1 text-yellow-300"></i>বাউফল</span>
+            </div>
+          </div>
+
+          <!-- Services Grid -->
+          <div class="px-4 pb-6">
+            <h3 class="text-gray-700 font-bold text-xs mb-3">আমাদের সেবাসমূহ (Our Services)</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div onclick="openService('bus-service')" class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-teal-500 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center">
+                <div class="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mb-3 text-base shadow-sm">
+                  <i class="fa-solid fa-bus"></i>
+                </div>
+                <span class="font-bold text-[11px] text-gray-800">Bus Ticket Book</span>
+              </div>
+              <div onclick="openService('ride-service')" class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-teal-500 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center">
+                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center mb-3 text-base shadow-sm">
+                  <i class="fa-solid fa-motorcycle"></i>
+                </div>
+                <span class="font-bold text-[11px] text-gray-800">Ride Service</span>
+              </div>
+              <div onclick="openService('food-service')" class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-teal-500 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center">
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-3 text-base shadow-sm">
+                  <i class="fa-solid fa-basket-shopping"></i>
+                </div>
+                <span class="font-bold text-[11px] text-gray-800">Food & Grocery</span>
+              </div>
+              <div onclick="openService('helpline-service')" class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-teal-500 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center">
+                <div class="w-11 h-11 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center mb-3 text-base shadow-sm">
+                  <i class="fa-solid fa-headset"></i>
+                </div>
+                <span class="font-bold text-[11px] text-gray-800">Helpline</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB-B: ACTIVITY CONTENT -->
+        <div id="tab-activity" class="dash-tab-content p-4 space-y-4">
+          <h3 class="font-bold text-gray-800 text-sm">আমার ক্রিয়াকলাপ</h3>
+          <div class="text-center py-12 text-xs text-gray-400">
+            <i class="fa-solid fa-clock-rotate-left text-3xl text-gray-300 mb-2"></i>
+            <p>আপনার সাম্প্রতিক সকল বুকিং বা অর্ডার হিস্ট্রি এখানে জমা হবে।</p>
+          </div>
+        </div>
+
+        <!-- TAB-C: DEDICATED PROFILE PAGE -->
+        <div id="tab-profile" class="dash-tab-content">
+          <div class="p-6 text-center border-b border-gray-50 bg-gray-50/50">
+            <div id="profile-pic-large" class="w-20 h-20 rounded-full border border-teal-200 bg-white mx-auto flex items-center justify-center overflow-hidden mb-3"></div>
+            <h3 id="profile-name" class="font-bold text-gray-800 text-base">ব্যবহারকারীর নাম</h3>
+            <p id="profile-phone" class="text-xs text-gray-400 mt-0.5">০১৭xxxxxxxx</p>
+          </div>
+          <div class="p-4 space-y-3">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ঠিকানার বিবরণ</h4>
+            <div class="flex items-center space-x-3 p-3 bg-white border border-gray-100 rounded-xl">
+              <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+              <div class="text-xs">
+                <p class="text-gray-400 font-medium text-[10px]">আমার স্থায়ী ঠিকানা</p>
+                <p id="profile-full-location" class="font-semibold text-gray-800">পটুয়াখালী, বাউফল</p>
+              </div>
+            </div>
+            <div class="pt-4">
+              <button onclick="logoutUser()" class="w-full bg-red-50 hover:bg-red-100 active:scale-95 text-red-600 font-bold py-2.5 rounded-xl text-xs transition border border-red-100 flex items-center justify-center space-x-1.5 shadow-sm">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>লগআউট করুন</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- App Bottom Navigation Bar -->
+      <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 h-14 flex items-center justify-around z-20 shadow-lg">
+        <button id="nav-btn-home" onclick="switchDashTab('home')" class="flex flex-col items-center justify-center flex-grow py-1 text-teal-600 transition-all duration-300">
+          <i class="fa-solid fa-house text-sm"></i>
+          <span class="text-[9px] font-bold mt-1">হোম</span>
+        </button>
+        <button id="nav-btn-activity" onclick="switchDashTab('activity')" class="flex flex-col items-center justify-center flex-grow py-1 text-gray-400 transition-all duration-300">
+          <i class="fa-solid fa-clipboard-list text-sm"></i>
+          <span class="text-[9px] font-medium mt-1">কার্যকলাপ</span>
+        </button>
+        <button id="nav-btn-profile" onclick="switchDashTab('profile')" class="flex flex-col items-center justify-center flex-grow py-1 text-gray-400 transition-all duration-300">
+          <i class="fa-solid fa-user text-sm"></i>
+          <span class="text-[9px] font-medium mt-1">প্রোফাইল</span>
+        </button>
+      </nav>
+
+    </div>
+
+    <!-- 4. SUB-SERVICES VIEW -->
+    <div id="page-service" class="app-page bg-white">
+      <div class="px-4 py-3 flex items-center space-x-3 border-b border-gray-50 sticky top-0 bg-white z-10 shadow-sm">
+        <button onclick="goBack()" class="text-gray-700 hover:text-teal-600 text-sm transition"><i class="fa-solid fa-arrow-left"></i></button>
+        <span id="service-title" class="font-bold text-gray-800 text-sm">সার্ভিস</span>
+      </div>
+      <div id="service-content" class="p-4 flex-grow overflow-y-auto bg-gray-50/30"></div>
+    </div>
+
+    <!-- ADMIN DYNAMIC POP-UP DIALOG (TRANSITIONS MODAL) -->
+    <div id="admin-popup-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
+      <div class="bg-white rounded-3xl p-5 max-w-xs w-full text-center space-y-4 shadow-2xl relative">
+        <button onclick="closeAdminPopup()" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 text-base"><i class="fa-solid fa-circle-xmark"></i></button>
+        <div id="popup-image-div" class="hidden">
+          <img id="popup-img" src="" class="w-full h-32 object-cover rounded-2xl border">
+        </div>
+        <div class="space-y-1">
+          <h3 id="popup-title" class="font-extrabold text-gray-900 text-sm"></h3>
+          <p id="popup-message" class="text-gray-500 text-[11px] leading-relaxed"></p>
+        </div>
+        <button onclick="closeAdminPopup()" class="w-full bg-teal-600 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition-all">ঠিক আছে</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_HBGuQSh_GzqrHqHbgdaoBikLZsK3Qqs",
+      authDomain: "new-all-f99f7.firebaseapp.com",
+      databaseURL: "https://new-all-f99f7-default-rtdb.firebaseio.com",
+      projectId: "new-all-f99f7",
+      storageBucket: "new-all-f99f7.firebasestorage.app",
+      messagingSenderId: "1069748173900",
+      appId: "1:1069748173900:web:158d6336c0f4628133c8e9",
+      measurementId: "G-V6DZ37WSBF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const imgbbApiKey = "4f29b88d8207f6e762c2c852d5c895f8";
+
+    let currentUser = null;
+    let avatarUrl = "";
+
+    window.switchPage = function(pageId) {
+      document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
+      const activeNode = document.getElementById(pageId);
+      if(activeNode) {
+        activeNode.classList.add('active');
+        window.scrollTo(0, 0);
+      }
+    };
+
+    // Auto-Login Check on startup (bypasses login/reg form cleanly)
+    const savedPhone = localStorage.getItem('chuto_user_phone');
+    if (savedPhone) {
+      const userRef = ref(db, 'users/' + savedPhone);
+      get(userRef).then((snapshot) => {
+        if(snapshot.exists()) {
+          currentUser = snapshot.val();
+          setupMainDashboard();
+        } else {
+          localStorage.removeItem('chuto_user_phone');
+          switchPage('page-register');
+        }
+      }).catch(() => {
+        switchPage('page-register');
+      });
+    } else {
+      setTimeout(() => {
+        switchPage('page-register');
+      }, 1200);
+    }
+
+    // Dynamic Pop-up close handler
+    window.closeAdminPopup = function() {
+      document.getElementById('admin-popup-modal').classList.add('hidden');
+    };
+
+    // Listen to Admin Sliders & Banners
+    function listenToAdminConfig() {
+      // 1. Dynamic slider image update
+      onValue(ref(db, 'admin_config/sliders'), (snap) => {
+        if(snap.exists()) {
+          const sliderUrl = snap.val().imageUrl;
+          if(sliderUrl) {
+            document.getElementById('banner-slider-container').innerHTML = `
+              <div class="rounded-2xl overflow-hidden shadow-md h-36 relative">
+                <img src="${sliderUrl}" class="w-full h-full object-cover">
+              </div>
+            `;
+          }
+        }
+      });
+
+      // 2. Dynamic Pop-up Notification overlay trigger
+      onValue(ref(db, 'admin_config/popup'), (snap) => {
+        if(snap.exists()) {
+          const popup = snap.val();
+          const sessionDismiss = sessionStorage.getItem('dismissed_chuto_popup');
+          if(popup.active && sessionDismiss !== popup.id) {
+            document.getElementById('popup-title').innerText = popup.title;
+            document.getElementById('popup-message').innerText = popup.message;
+            if(popup.imageUrl) {
+              const popupImgDiv = document.getElementById('popup-image-div');
+              popupImgDiv.classList.remove('hidden');
+              document.getElementById('popup-img').src = popup.imageUrl;
+            }
+            document.getElementById('admin-popup-modal').classList.remove('hidden');
+            
+            // Set session storage to not repeat pop-up inside this session until updated
+            sessionStorage.setItem('dismissed_chuto_popup', popup.id);
+          }
+        }
+      });
+    }
+
+    window.switchDashTab = function(tabId) {
+      document.querySelectorAll('.dash-tab-content').forEach(content => content.classList.remove('active'));
+      const activeContent = document.getElementById(`tab-${tabId}`);
+      if(activeContent) activeContent.classList.add('active');
+
+      const buttons = {
+        home: document.getElementById('nav-btn-home'),
+        activity: document.getElementById('nav-btn-activity'),
+        profile: document.getElementById('nav-btn-profile')
+      };
+
+      Object.keys(buttons).forEach(key => {
+        if(key === tabId) {
+          buttons[key].className = "flex flex-col items-center justify-center flex-grow py-1 text-teal-600 scale-105 transition-all duration-300";
+          buttons[key].querySelector('span').className = "text-[9px] font-bold mt-1";
+        } else {
+          buttons[key].className = "flex flex-col items-center justify-center flex-grow py-1 text-gray-400 transition-all duration-300";
+          buttons[key].querySelector('span').className = "text-[9px] font-medium mt-1";
+        }
+      });
+    };
+
+    // ImgBB Profile Picture upload
+    document.getElementById('reg-avatar').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('avatar-preview').innerHTML = `<i class="fa-solid fa-spinner fa-spin text-teal-600 text-xs"></i>`;
+      
+      const formData = new FormData();
+      formData.append("image", file);
+      
+      try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+        const result = await response.json();
+        if (result.success) {
+          avatarUrl = result.data.url;
+          document.getElementById('avatar-preview').innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover">`;
+        } else {
+          Swal.fire('ত্রুটি', 'ছবি আপলোড ব্যর্থ হয়েছে।', 'error');
+          document.getElementById('avatar-preview').innerHTML = `<i class="fa-solid fa-camera text-gray-400"></i>`;
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire('ত্রুটি', 'কানেকশন পরীক্ষা করুন।', 'error');
+      }
+    });
+
+    // Account registration
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+      const district = document.getElementById('reg-district').value;
+      const upazila = document.getElementById('reg-upazila').value;
+      const village = document.getElementById('reg-village').value.trim();
+
+      if (!name || !phone || !password || !village) {
+        Swal.fire('অসম্পূর্ণ ফর্ম', 'সবগুলো তথ্য সঠিকভাবে প্রদান করুন!', 'warning');
+        return;
+      }
+
+      const userRef = ref(db, 'users/' + phone);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        Swal.fire('অ্যাকাউন্ট রয়েছে', 'এই নাম্বারে ইতিমধ্যে অ্যাকাউন্ট তৈরি করা আছে।', 'error');
+        return;
+      }
+
+      await set(userRef, { name, phone, password, district, upazila, village, profilePic: avatarUrl || "" });
+      localStorage.setItem('chuto_user_phone', phone);
+
+      Swal.fire({ title: 'নিবন্ধন সফল!', text: 'সফলভাবে অ্যাকাউন্ট তৈরি হয়েছে।', icon: 'success', timer: 1500, showConfirmButton: false });
+      currentUser = { name, phone, district, upazila, village, profilePic: avatarUrl };
+      setupMainDashboard();
+    });
+
+    // Login
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const phone = document.getElementById('login-phone').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+
+      if(!phone || !password) {
+        Swal.fire('ত্রুটি', 'মোবাইল ও পাসওয়ার্ড দিন', 'warning');
+        return;
+      }
+
+      const snapshot = await get(ref(db, 'users/' + phone));
+      if(snapshot.exists() && snapshot.val().password === password) {
+        currentUser = snapshot.val();
+        localStorage.setItem('chuto_user_phone', phone);
+        setupMainDashboard();
+      } else {
+        Swal.fire('লগইন ব্যর্থ', 'মোবাইল অথবা পাসওয়ার্ড ভুল হয়েছে!', 'error');
+      }
+    });
+
+    window.logoutUser = function() {
+      localStorage.removeItem('chuto_user_phone');
+      location.reload();
+    };
+
+    function setupMainDashboard() {
+      switchPage('page-dashboard');
+      switchDashTab('home');
+      listenToAdminConfig(); // Triggers config fetchers
+
+      const profileTrigger = document.getElementById('profile-trigger');
+      if(currentUser.profilePic) {
+        profileTrigger.innerHTML = `<img src="${currentUser.profilePic}" class="w-full h-full object-cover rounded-full">`;
+      } else {
+        profileTrigger.innerHTML = `<span>${currentUser.name.charAt(0)}</span>`;
+      }
+
+      document.getElementById('profile-name').innerText = currentUser.name;
+      document.getElementById('profile-phone').innerText = currentUser.phone;
+      document.getElementById('profile-full-location').innerText = `${currentUser.district}, ${currentUser.upazila}, ${currentUser.village}`;
+      
+      const profileLarge = document.getElementById('profile-pic-large');
+      if(currentUser.profilePic) {
+        profileLarge.innerHTML = `<img src="${currentUser.profilePic}" class="w-full h-full object-cover">`;
+      } else {
+        profileLarge.innerHTML = `<span class="text-2xl font-extrabold text-teal-600">${currentUser.name.charAt(0)}</span>`;
+      }
+    }
+
+    window.openService = function(serviceType) {
+      switchPage('page-service');
+      const contentDiv = document.getElementById('service-content');
+      const titleSpan = document.getElementById('service-title');
+
+      if (serviceType === 'bus-service') {
+        titleSpan.innerText = "Bus Tickets Pass";
+        loadBusService(contentDiv);
+      } else if (serviceType === 'ride-service') {
+        titleSpan.innerText = "Ride Service (ছুটো)";
+        loadRideService(contentDiv);
+      } else if (serviceType === 'food-service') {
+        titleSpan.innerText = "Food & Grocery";
+        loadFoodService(contentDiv);
+      } else if (serviceType === 'helpline-service') {
+        titleSpan.innerText = "Helpline Support";
+        contentDiv.innerHTML = `
+          <div class="text-center py-12 space-y-4 max-w-sm mx-auto">
+            <div class="w-16 h-16 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto text-2xl">
+              <i class="fa-solid fa-headset"></i>
+            </div>
+            <h3 class="font-bold text-gray-800 text-sm">চব্বিশ ঘণ্টা কাস্টমার সাপোর্ট</h3>
+            <p class="text-gray-400 text-xs px-4">আপনার যেকোনো সাহায্য বা অভিযোগের জন্য আমাদের টিমকে সরাসরি কল করুন। আমরা সবসময় প্রস্তুত।</p>
+            <a href="tel:01700000000" class="inline-flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-6 py-3 rounded-full shadow transition-all duration-300 active:scale-95"><i class="fa-solid fa-phone mr-1.5 animate-bounce"></i>সরাসরি কল দিন</a>
+          </div>
+        `;
+      }
+      history.pushState({service: serviceType}, null, "");
+    };
+
+    window.goBack = function() {
+      switchPage('page-dashboard');
+    };
+
+    window.onpopstate = function() {
+      goBack();
+    };
+
+    function getSkeletonHTML() {
+      return `
+        <div class="space-y-3">
+          <div class="p-4 bg-white border border-gray-100 rounded-2xl flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-xl shimmer"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-3 w-1/3 rounded shimmer"></div>
+              <div class="h-2 w-1/2 rounded shimmer"></div>
+            </div>
+          </div>
+          <div class="p-4 bg-white border border-gray-100 rounded-2xl flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-xl shimmer"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-3 w-1/4 rounded shimmer"></div>
+              <div class="h-2 w-2/3 rounded shimmer"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadBusService(container) {
+      container.innerHTML = getSkeletonHTML();
+      const busesRef = ref(db, 'buses');
+      const snapshot = await get(busesRef);
+      if(!snapshot.exists()) {
+        container.innerHTML = `<p class="text-center text-gray-400 text-xs py-10">বর্তমানে কোনো বাসের সিট ট্রিপ উপলব্ধ নেই।</p>`;
+        return;
+      }
+
+      let html = `<div class="space-y-3">`;
+      snapshot.forEach((child) => {
+        const bus = child.val();
+        const busId = child.key;
+        html += `
+          <div class="p-4 bg-white border border-gray-100 rounded-2xl flex justify-between items-center shadow-sm">
+            <div class="flex items-center space-x-3">
+              <img src="${bus.busImage || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-gray-150">
+              <div>
+                <h4 class="font-bold text-gray-800 text-xs">${bus.busName}</h4>
+                <p class="text-[10px] text-gray-400"><i class="fa-solid fa-route mr-1 text-teal-600"></i>${bus.routeFrom} ➔ ${bus.routeTo}</p>
+                <p class="text-[10px] text-gray-400"><i class="fa-solid fa-clock mr-1 text-teal-600"></i>${bus.date} | ${bus.time}</p>
+              </div>
+            </div>
+            <div class="text-right flex flex-col justify-between h-12">
+              <span class="text-xs font-bold text-teal-600">৳${bus.price}</span>
+              <button onclick="selectBusSeats('${busId}', ${bus.price})" class="bg-teal-600 hover:bg-teal-700 active:scale-95 text-white px-3.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all">বুক</button>
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    window.selectBusSeats = async function(busId, price) {
+      const container = document.getElementById('service-content');
+      container.innerHTML = `<div class="text-center py-6 text-xs text-gray-400"><i class="fa-solid fa-spinner fa-spin text-teal-600 text-xl"></i> আসন বিন্যাস লোড হচ্ছে...</div>`;
+      
+      const snapshot = await get(ref(db, `buses/${busId}`));
+      const bus = snapshot.val();
+      const bookedSeats = bus.bookedSeats || {};
+      
+      let seatGrid = `<div class="grid grid-cols-4 gap-2.5 max-w-xs mx-auto my-4">`;
+      const seats = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4", "D1", "D2", "D3", "D4"];
+      
+      seats.forEach(seat => {
+        const isBooked = bookedSeats[seat];
+        const btnClass = isBooked 
+          ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed' 
+          : 'bg-teal-50 text-teal-700 border border-teal-100 hover:bg-teal-600 hover:text-white active:scale-90';
+        seatGrid += `<button ${isBooked ? 'disabled' : ''} onclick="confirmBookingPage('${busId}', '${seat}', ${price})" class="${btnClass} py-2.5 rounded-xl font-bold text-xs transition-all">${seat}</button>`;
+      });
+      seatGrid += `</div>`;
+
+      container.innerHTML = `
+        <div class="space-y-3">
+          <div class="bg-gray-50 p-3 rounded-lg border text-center text-xs">
+            <h4 class="font-bold text-teal-600">${bus.busName}</h4>
+            <p class="text-[10px] text-gray-400">${bus.routeFrom} ➔ ${bus.routeTo}</p>
+          </div>
+          ${seatGrid}
+          <div class="flex justify-center space-x-4 text-[10px] text-gray-400">
+            <span class="flex items-center"><span class="w-3 h-3 bg-teal-50 border border-teal-100 inline-block mr-1 rounded"></span> খালি</span>
+            <span class="flex items-center"><span class="w-3 h-3 bg-gray-100 inline-block mr-1 rounded"></span> বুকд</span>
+          </div>
+        </div>
+      `;
+    };
+
+    window.confirmBookingPage = function(busId, seatNo, price) {
+      const container = document.getElementById('service-content');
+      container.innerHTML = `
+        <div class="space-y-4 max-w-sm mx-auto text-xs">
+          <div class="bg-teal-50/50 p-5 rounded-2xl border border-teal-100 text-center">
+            <p class="text-gray-500 text-[10px]">আসন:</p>
+            <p class="text-base font-bold text-teal-700">${seatNo}</p>
+            <p class="text-gray-500 text-[10px] mt-1.5">মূল্য:</p>
+            <p class="text-base font-bold text-teal-700">৳${price}</p>
+          </div>
+          <div class="bg-white p-4 border border-gray-100 rounded-xl space-y-3 shadow-sm">
+            <h4 class="font-bold text-gray-800 border-b pb-1.5">পেমেন্ট কপি পেস্ট</h4>
+            <div class="bg-gray-50 p-2.5 rounded-lg flex justify-between items-center text-[11px]">
+              <span>বিকাশ (পার্সোনাল): <strong>০১৭৯৯৮৮৭৭৬৬</strong></span>
+              <button onclick="navigator.clipboard.writeText('01799887766'); Swal.fire('কপি হয়েছে','','success')" class="text-teal-600 font-bold active:scale-95"><i class="fa-solid fa-copy"></i> কপি</button>
+            </div>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-gray-500 mb-0.5">যে নাম্বার দিয়ে টাকা পাঠিয়েছেন:</label>
+                <input type="tel" id="pay-sender" placeholder="মোবাইল নাম্বার দিন" class="w-full px-3 py-2 border border-gray-200 rounded-lg">
+              </div>
+              <div>
+                <label class="block text-gray-500 mb-0.5">ট্রানজেকশন আইডি (TxID):</label>
+                <input type="text" id="pay-txid" placeholder="8N76FG" class="w-full px-3 py-2 border border-gray-200 rounded-lg">
+              </div>
+            </div>
+            <button onclick="submitTicketRequest('${busId}', '${seatNo}', ${price})" class="w-full bg-teal-600 text-white font-bold py-2.5 rounded-lg hover:bg-teal-700 transition">পেমেন্ট সাবমিট</button>
+          </div>
+        </div>
+      `;
+    };
+
+    window.submitTicketRequest = async function(busId, seatNo, price) {
+      const senderPhone = document.getElementById('pay-sender').value.trim();
+      const txId = document.getElementById('pay-txid').value.trim();
+
+      if(!senderPhone || !txId) {
+        Swal.fire('অসম্পূর্ণ', 'পেমেন্ট তথ্য প্রদান করুন।', 'warning');
+        return;
+      }
+
+      const ticketRef = ref(db, 'tickets/' + push(ref(db, 'tickets')).key);
+      await set(ticketRef, { userId: currentUser.phone, userName: currentUser.name, busId, seatNo, price, senderPhone, txId, status: 'pending' });
+
+      Swal.fire('অনুরোধ পাঠানো হয়েছে!', 'টিকিট অনুমোদিত হওয়া পর্যন্ত অপেক্ষা করুন।', 'success');
+      loadBusService(document.getElementById('service-content'));
+      
+      onValue(ticketRef, (snap) => {
+        const ticket = snap.val();
+        if(ticket && ticket.status === 'confirmed') {
+          const container = document.getElementById('service-content');
+          container.innerHTML = `
+            <div class="space-y-4 max-w-sm mx-auto pt-4 text-xs">
+              <div class="bg-gradient-to-br from-teal-600 to-emerald-700 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-gray-50 rounded-r-full"></div>
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-gray-50 rounded-l-full"></div>
+                <div class="border-b border-dashed border-white/20 pb-3 flex justify-between items-center">
+                  <div class="flex items-center space-x-1.5">
+                    <i class="fa-solid fa-bus text-yellow-300"></i>
+                    <span class="font-extrabold tracking-wide uppercase text-xs">Chuto Bus Pass</span>
+                  </div>
+                  <span class="bg-white/15 text-[8px] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">CONFIRMED</span>
+                </div>
+                <div class="py-4 space-y-2">
+                  <div class="flex justify-between">
+                    <p class="text-white/60">যাত্রীর নাম</p>
+                    <p class="font-bold">${ticket.userName}</p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p class="text-white/60">আসন নম্বর</p>
+                    <p class="font-bold text-sm text-yellow-300">${ticket.seatNo}</p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p class="text-white/60">বুকিং কোড</p>
+                    <p class="font-bold tracking-wider text-yellow-300">CH-${snap.key.substring(1, 7).toUpperCase()}</p>
+                  </div>
+                </div>
+                <div class="border-t border-dashed border-white/20 pt-3 text-center">
+                  <p class="text-[9px] text-teal-100">টিকিট রিসিভটি বাসে ওঠার সময় ড্রাইভারকে প্রদর্শন করুন।</p>
+                </div>
+              </div>
+              <button onclick="loadBusService(document.getElementById('service-content'))" class="w-full bg-teal-600 text-white font-bold py-2.5 rounded-lg active:scale-95 transition-all">ফিরে যান</button>
+            </div>
+          `;
+        }
+      });
+    };
+
+    // 2. Rides (Refined with 5 specific vehicles)
+    function loadRideService(container) {
+      container.innerHTML = `
+        <div class="space-y-4 max-w-sm mx-auto text-xs">
+          <div class="bg-blue-50/20 p-5 rounded-2xl border border-blue-100 space-y-3.5">
+            <h4 class="font-bold text-blue-700"><i class="fa-solid fa-motorcycle mr-1.5"></i>রাইড বুকিং ফর্ম</h4>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-gray-500 mb-1 font-semibold">পিকআপ পয়েন্ট (কোথা থেকে উঠবেন):</label>
+                <input type="text" id="ride-pickup" placeholder="স্থান দিন" class="w-full px-3.5 py-2.5 border rounded-xl focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-gray-500 mb-1 font-semibold">গন্তব্য (কোথায় যাবেন):</label>
+                <input type="text" id="ride-drop" placeholder="গন্তব্য দিন" class="w-full px-3.5 py-2.5 border rounded-xl focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-gray-500 mb-1 font-semibold">যানবাহন নির্বাচন:</label>
+                <!-- Updated with 5 specific vehicles requested by user -->
+                <select id="ride-vehicle" class="w-full px-3 py-2.5 bg-white border rounded-xl focus:outline-none text-gray-600">
+                  <option value="Honda">হোন্ডা (মোটরসাইকেল)</option>
+                  <option value="Auto-Rickshaw">অটো রিকশা</option>
+                  <option value="Auto">অটো (ব্যাটারি চালিত)</option>
+                  <option value="Mahindra">মাহিন্দ্রা</option>
+                  <option value="CNG">সিএনজি</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-500 mb-1 font-semibold">সচল মোবাইল নাম্বার:</label>
+                <input type="tel" id="ride-phone" placeholder="মোবাইল নাম্বার দিন" class="w-full px-3.5 py-2.5 border rounded-xl focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-gray-500 mb-1 font-semibold">সর্বোচ্চ কত মিনিট অপেক্ষা করবেন:</label>
+                <input type="number" id="ride-wait" placeholder="অপেক্ষার সময় দিন" class="w-full px-3.5 py-2.5 border rounded-xl focus:outline-none">
+              </div>
+            </div>
+            <button onclick="requestRide()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold py-3 rounded-xl transition shadow-sm">রাইড রিকোয়েস্ট পাঠান</button>
+          </div>
+          <div id="ride-tracking" class="hidden bg-gray-50 p-5 rounded-2xl border border-gray-100 text-center"></div>
+        </div>
+      `;
+    }
+
+    window.requestRide = async function() {
+      const pickup = document.getElementById('ride-pickup').value.trim();
+      const drop = document.getElementById('ride-drop').value.trim();
+      const vehicle = document.getElementById('ride-vehicle').value;
+      const phone = document.getElementById('ride-phone').value.trim();
+      const wait = document.getElementById('ride-wait').value.trim();
+
+      if(!pickup || !drop || !phone || !wait) {
+        Swal.fire('অসম্পূর্ণ ফর্ম', 'সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন।', 'warning');
+        return;
+      }
+
+      const rideId = push(ref(db, 'rides')).key;
+      const rideRef = ref(db, 'rides/' + rideId);
+
+      await set(rideRef, { userId: currentUser.phone, userName: currentUser.name, pickup, drop, vehicle, phone, wait, status: 'pending' });
+
+      const trackingDiv = document.getElementById('ride-tracking');
+      trackingDiv.classList.remove('hidden');
+      trackingDiv.innerHTML = `
+        <div class="flex flex-col items-center justify-center space-y-3 py-4 text-xs">
+          <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-blue-800 font-bold tracking-wide">নিকটস্থ রাইডারের সন্ধান চলছে...</span>
+        </div>
+      `;
+
+      onValue(rideRef, (snap) => {
+        const ride = snap.val();
+        if(ride && ride.status === 'accepted') {
+          let step1 = "border-teal-500 text-teal-600 bg-teal-50";
+          let step2 = "border-gray-200 text-gray-400";
+          let step3 = "border-gray-200 text-gray-400";
+
+          if(ride.tripStatus === "যাত্রী গাড়িতে উঠেছে") {
+            step2 = "border-teal-500 text-teal-600 bg-teal-50 animate-pulse";
+          } else if (ride.tripStatus === "completed") {
+            step2 = "border-teal-500 text-teal-600 bg-teal-50";
+            step3 = "border-teal-500 text-teal-600 bg-teal-50";
+          }
+
+          trackingDiv.innerHTML = `
+            <div class="space-y-4 text-xs text-left">
+              <div class="p-3 bg-white border border-teal-100 rounded-xl flex items-center space-x-3 shadow-sm">
+                <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 font-extrabold text-sm">${ride.riderName.charAt(0)}</div>
+                <div class="flex-grow">
+                  <p class="font-bold text-gray-800">${ride.riderName}</p>
+                  <p class="text-[10px] text-gray-400">প্লেট: ${ride.riderPlate}</p>
+                </div>
+                <a href="tel:${ride.riderPhone}" class="w-8 h-8 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-sm active:scale-95 transition-all"><i class="fa-solid fa-phone"></i></a>
+              </div>
+              <div class="space-y-4 pl-3 py-2 border-l-2 border-gray-100 relative">
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[10px] ${step1}"><i class="fa-solid fa-check"></i></div>
+                  <span class="font-semibold text-gray-700">রাইডার আসার পথে</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[10px] ${step2}">২</div>
+                  <span class="font-semibold text-gray-700">যাত্রী গাড়িতে উঠেছেন</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[10px] ${step3}">৩</div>
+                  <span class="font-semibold text-gray-700">গন্তব্যে পৌঁছেছেন</span>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (ride && ride.tripStatus === 'completed') {
+          trackingDiv.innerHTML = `<p class="text-green-600 font-bold py-4">রাইড সফলভাবে শেষ হয়েছে। Chuto ব্যবহার করার জন্য ধন্যবাদ!</p>`;
+        }
+      });
+    };
+
+    // 3. Food & Grocery
+    function loadFoodService(container) {
+      container.innerHTML = `
+        <div class="space-y-4 text-xs">
+          <div class="flex border-b border-gray-100">
+            <button onclick="switchFoodTab('restaurant')" id="tab-rest" class="flex-1 py-2 font-bold text-center border-b-2 border-teal-600 text-teal-600 transition-all duration-200">রেস্টুরেন্ট</button>
+            <button onclick="switchFoodTab('grocery')" id="tab-groc" class="flex-1 py-2 font-medium text-center text-gray-400 border-b-2 border-transparent transition-all duration-200">মুদি বাজার</button>
+          </div>
+          <div id="food-list" class="space-y-2.5"></div>
+        </div>
+      `;
+      switchFoodTab('restaurant');
+    }
+
+    window.switchFoodTab = async function(type) {
+      const tabRest = document.getElementById('tab-rest');
+      const tabGroc = document.getElementById('tab-groc');
+      const listDiv = document.getElementById('food-list');
+      
+      if(!tabRest || !tabGroc || !listDiv) return;
+
+      if (type === 'restaurant') {
+        tabRest.className = "flex-1 py-2 font-bold text-center border-b-2 border-teal-600 text-teal-600 transition-all duration-200";
+        tabGroc.className = "flex-1 py-2 font-medium text-center text-gray-400 border-b-2 border-transparent transition-all duration-200";
+      } else {
+        tabGroc.className = "flex-1 py-2 font-bold text-center border-b-2 border-teal-600 text-teal-600 transition-all duration-200";
+        tabRest.className = "flex-1 py-2 font-medium text-center text-gray-400 border-b-2 border-transparent transition-all duration-200";
+      }
+
+      listDiv.innerHTML = getSkeletonHTML();
+
+      const snap = await get(ref(db, 'merchants'));
+      let html = "";
+      if (snap.exists()) {
+        snap.forEach((child) => {
+          const mer = child.val();
+          if(mer.type === type) {
+            html += `
+              <div onclick="openStoreMenu('${child.key}', '${mer.name}')" class="p-3 bg-white border border-gray-100 rounded-2xl flex items-center space-x-3 cursor-pointer hover:border-teal-500 transition shadow-sm active:scale-95 duration-200">
+                <img src="${mer.image || 'https://via.placeholder.com/50'}" class="w-11 h-11 object-cover rounded-xl border border-gray-100">
+                <div>
+                  <h4 class="font-bold text-gray-800 text-xs">${mer.name}</h4>
+                  <p class="text-[10px] text-gray-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1 text-teal-600"></i>${mer.location}</p>
+                </div>
+              </div>
+            `;
+          }
+        });
+      }
+      listDiv.innerHTML = html || `<p class="text-center text-gray-400 text-xs py-6">বর্তমানে কোনো দোকান নিবন্ধিত নেই।</p>`;
+    };
+
+    window.openStoreMenu = async function(merchantId, storeName) {
+      const container = document.getElementById('service-content');
+      container.innerHTML = getSkeletonHTML();
+
+      const snap = await get(ref(db, `menu_items/${merchantId}`));
+      let menuHtml = `<div class="space-y-3 text-xs">
+        <div class="p-2.5 bg-teal-50/50 rounded-xl font-bold text-teal-700 text-center border border-teal-100">${storeName}</div>
+      `;
+      if(snap.exists()) {
+        snap.forEach((child) => {
+          const item = child.val();
+          menuHtml += `
+            <div class="p-3 bg-white border border-gray-100 rounded-2xl flex justify-between items-center shadow-sm">
+              <div class="flex items-center space-x-2.5">
+                <img src="${item.image || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border">
+                <div>
+                  <h5 class="font-bold text-gray-800 text-xs">${item.name}</h5>
+                  <p class="text-[10px] text-teal-600 font-bold">৳${item.price}</p>
+                </div>
+              </div>
+              <button onclick="placeFoodOrder('${merchantId}', '${item.name}', ${item.price})" class="bg-teal-600 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-teal-700 active:scale-95 transition-all">অর্ডার</button>
+            </div>
+          `;
+        });
+      } else {
+        menuHtml += `<p class="text-center text-gray-400 text-xs py-6">কোনো আইটেম পাওয়া যায়নি।</p>`;
+      }
+      menuHtml += `</div>`;
+      container.innerHTML = menuHtml;
+    };
+
+    window.placeFoodOrder = async function(merchantId, itemName, price) {
+      const { value: address } = await Swal.fire({
+        title: 'ডেলিভারি ঠিকানা দিন',
+        input: 'text',
+        inputLabel: `আইটেম: ${itemName} | মূল্য: ৳${price}`,
+        inputPlaceholder: 'সুনির্দিষ্ট গ্রাম ও বাড়ি নম্বর দিন',
+        showCancelButton: true,
+        confirmButtonColor: '#0d9488'
+      });
+
+      if(!address) return;
+
+      const orderId = push(ref(db, 'orders')).key;
+      await set(ref(db, 'orders/' + orderId), { userId: currentUser.phone, userName: currentUser.name, merchantId, itemName, price, address, status: 'pending' });
+      Swal.fire('অর্ডার সফল!', 'মার্চেন্ট দ্রুততম সময়ে অর্ডারটি প্রসেস করবে।', 'success');
+    };
+  </script>
+</body>
+</html>

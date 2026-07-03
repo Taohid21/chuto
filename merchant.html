@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuto - মার্চেন্ট পোর্টাল</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SweetAlert2 for Popups -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+    .mobile-shell {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+    .app-page {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+    }
+    .app-page.active {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-shell">
+
+    <!-- A. MERCHANT REGISTER (Opens First) -->
+    <div id="page-register" class="app-page active p-6 justify-center">
+      <div class="w-full max-w-sm mx-auto space-y-5">
+        <div class="text-center space-y-1">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 mb-1">
+            <i class="fa-solid fa-shop text-xl"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-900">Chuto মার্চেন্ট অ্যাকাউন্ট</h1>
+          <p class="text-xs text-gray-500">আপনার ব্যবসা বা বাস কোম্পানি যুক্ত করুন</p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Logo Upload Button -->
+          <div class="flex flex-col items-center justify-center">
+            <label for="m-logo" class="cursor-pointer relative group">
+              <div id="logo-preview" class="w-16 h-16 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden hover:border-emerald-500 transition-all">
+                <i class="fa-solid fa-camera text-gray-400 text-sm"></i>
+              </div>
+            </label>
+            <input type="file" id="m-logo" accept="image/*" class="hidden">
+            <span class="text-[10px] text-gray-400 mt-1.5">লোগো / কভার ইমেজ (ঐচ্ছিক)</span>
+          </div>
+
+          <!-- Input Fields -->
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">ব্যবসায়িক প্রতিষ্ঠানের নাম</label>
+              <input type="text" id="m-name" placeholder="উদা: ক্যাফে বাউফল / সুন্দরবন ট্রাভেলস" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">ক্যাটাগরি</label>
+              <select id="m-type" class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 text-gray-600">
+                <option value="">নির্বাচন করুন</option>
+                <option value="restaurant">রেস্টুরেন্ট (খাবার)</option>
+                <option value="grocery">মুদি দোকান (গ্রোসারি)</option>
+                <option value="bus">বাস কোম্পানি (টিকেট বুকিং)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">মোবাইল নাম্বার</label>
+              <input type="tel" id="m-phone" placeholder="০১৭xxxxxxxx" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">পাসওয়ার্ড</label>
+              <input type="password" id="m-password" placeholder="কমপক্ষে ৬ সংখ্যার" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">সচল বিকাশ নম্বর (পার্সোনাল)</label>
+              <input type="tel" id="m-bkash" placeholder="পেমেন্ট সংগ্রহের জন্য" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <!-- Granular Location -->
+            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 space-y-2.5 mt-2">
+              <p class="text-[11px] font-bold text-gray-600 border-b pb-1">প্রতিষ্ঠানের ঠিকানা (বাউফল এলাকা)</p>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-gray-400 mb-0.5">জেলা</label>
+                  <select id="m-district" class="w-full px-2 py-2 bg-white border border-gray-200 rounded-md text-gray-600">
+                    <option value="Patuakhali">পটুয়াখালী</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-gray-400 mb-0.5">উপজেলা</label>
+                  <select id="m-upazila" class="w-full px-2 py-2 bg-white border border-gray-200 rounded-md text-gray-600">
+                    <option value="Bauphal">বাউফল</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-gray-400 mb-0.5">গ্রাম / ইউনিয়ন / বাজার এলাকা</label>
+                <input type="text" id="m-village" placeholder="উদা: কালাইয়া বাজার / বাউফল সদর" class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button id="btn-register" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs transition-all shadow-sm">মার্চেন্ট নিবন্ধন করুন</button>
+          </div>
+          
+          <div class="text-center">
+            <span class="text-xs text-gray-500">ইতিমধ্যে অ্যাকাউন্ট আছে? </span>
+            <button onclick="switchPage('page-login')" class="text-xs text-emerald-600 font-bold hover:underline">লগইন করুন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B. MERCHANT LOGIN -->
+    <div id="page-login" class="app-page p-6 justify-center">
+      <div class="w-full max-w-sm mx-auto space-y-6">
+        <div class="text-center space-y-1">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 mb-1">
+            <i class="fa-solid fa-lock text-xl"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-900">মার্চেন্ট লগইন</h1>
+          <p class="text-xs text-gray-500">আপনার মোবাইল ও পাসওয়ার্ড দিন</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">মোবাইল নাম্বার</label>
+              <input type="tel" id="login-phone" placeholder="০১৭xxxxxxxx" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-gray-500 mb-1 font-medium">পাসওয়ার্ড</label>
+              <input type="password" id="login-password" placeholder="আপনার পাসওয়ার্ড" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm">প্রবেশ করুন</button>
+          </div>
+
+          <div class="text-center">
+            <span class="text-xs text-gray-500">নতুন মার্চেন্ট? </span>
+            <button onclick="switchPage('page-register')" class="text-xs text-emerald-600 font-bold hover:underline">এখানে অ্যাকাউন্ট খুলুন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C. DASHBOARD (Protected view) -->
+    <div id="page-dashboard" class="app-page bg-white">
+      <!-- Navbar -->
+      <header class="px-4 py-3 flex justify-between items-center border-b border-gray-100">
+        <div class="flex items-center space-x-1.5">
+          <i class="fa-solid fa-store text-emerald-600 text-lg"></i>
+          <span id="merchant-title" class="font-bold text-sm text-gray-800">মার্চেন্ট ড্যাশবোর্ড</span>
+        </div>
+        <button onclick="location.reload()" class="text-red-500 text-xs font-semibold"><i class="fa-solid fa-power-off"></i> লগআউট</button>
+      </header>
+
+      <!-- 1. BUS COMPANY DASHBOARD ACTIONS -->
+      <div id="panel-bus" class="hidden p-4 space-y-4 flex-grow overflow-y-auto">
+        <!-- Add Bus Trip Form -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+          <h3 class="font-bold text-gray-800 text-xs border-b pb-1.5"><i class="fa-solid fa-plus-circle mr-1 text-emerald-600"></i>নতুন বাস ট্রিপ যোগ করুন</h3>
+          <div class="space-y-2 text-xs">
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" id="bus-from" placeholder="পিকআপ (যেমন- বাউফল)" class="px-3 py-2 border rounded-lg">
+              <input type="text" id="bus-to" placeholder="গন্তব্য (যেমন- ঢাকা)" class="px-3 py-2 border rounded-lg">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="date" id="bus-date" class="px-3 py-2 border rounded-lg text-gray-500">
+              <input type="time" id="bus-time" class="px-3 py-2 border rounded-lg text-gray-500">
+            </div>
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <input type="number" id="bus-price" placeholder="টিকিটের মূল্য" class="px-3 py-2 border rounded-lg">
+              <input type="file" id="bus-img" accept="image/*" class="text-[10px]">
+            </div>
+          </div>
+          <button id="btn-add-bus" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs transition">ট্রিপ তৈরি করুন</button>
+        </div>
+
+        <!-- Live Ticket Requests -->
+        <div class="space-y-2">
+          <h3 class="font-bold text-gray-700 text-xs">পেন্ডিং বুকিং রিকোয়েস্ট সমূহ</h3>
+          <div id="bus-requests-list" class="space-y-2">
+            <!-- Dynamic request cards go here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. FOOD & GROCERY DASHBOARD ACTIONS -->
+      <div id="panel-food" class="hidden p-4 space-y-4 flex-grow overflow-y-auto">
+        <!-- Add Menu Item Form -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+          <h3 class="font-bold text-gray-800 text-xs border-b pb-1.5"><i class="fa-solid fa-hamburger mr-1 text-emerald-600"></i>মেনুতে নতুন আইটেম যোগ করুন</h3>
+          <div class="space-y-2 text-xs">
+            <input type="text" id="item-name" placeholder="আইটেম বা খাবারের নাম" class="w-full px-3 py-2 border rounded-lg">
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <input type="number" id="item-price" placeholder="মূল্য (৳)" class="w-full px-3 py-2 border rounded-lg">
+              <input type="file" id="item-img" accept="image/*" class="text-[10px]">
+            </div>
+          </div>
+          <button id="btn-add-item" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs transition">আইটেম যুক্ত করুন</button>
+        </div>
+
+        <!-- Food Orders List -->
+        <div class="space-y-2">
+          <h3 class="font-bold text-gray-700 text-xs">চলতি কাস্টমার অর্ডার সমূহ</h3>
+          <div id="food-orders-list" class="space-y-2">
+            <!-- Dynamic order cards go here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase & Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_HBGuQSh_GzqrHqHbgdaoBikLZsK3Qqs",
+      authDomain: "new-all-f99f7.firebaseapp.com",
+      databaseURL: "https://new-all-f99f7-default-rtdb.firebaseio.com",
+      projectId: "new-all-f99f7",
+      storageBucket: "new-all-f99f7.firebasestorage.app",
+      messagingSenderId: "1069748173900",
+      appId: "1:1069748173900:web:158d6336c0f4628133c8e9",
+      measurementId: "G-V6DZ37WSBF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const imgbbApiKey = "4f29b88d8207f6e762c2c852d5c895f8";
+
+    let currentMerchant = null;
+    let merchantPhone = "";
+    let uploadedLogoUrl = "";
+
+    window.switchPage = function(pageId) {
+      document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(pageId);
+      if(target) {
+        target.classList.add('active');
+        window.scrollTo(0,0);
+      }
+    };
+
+    // ImgBB Upload Handler
+    document.getElementById('m-logo').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      document.getElementById('logo-preview').innerHTML = `<i class="fa-solid fa-spinner fa-spin text-emerald-600 text-xs"></i>`;
+      
+      const formData = new FormData();
+      formData.append("image", file);
+      
+      try {
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+        const result = await res.json();
+        if(result.success) {
+          uploadedLogoUrl = result.data.url;
+          document.getElementById('logo-preview').innerHTML = `<img src="${uploadedLogoUrl}" class="w-full h-full object-cover">`;
+        } else {
+          Swal.fire('ত্রুটি', 'ছবি আপলোড করতে সমস্যা হয়েছে।', 'error');
+          document.getElementById('logo-preview').innerHTML = `<i class="fa-solid fa-camera text-gray-400"></i>`;
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire('কানেকশন এরর', 'ইন্টারনেট চেক করুন।', 'error');
+      }
+    });
+
+    // Register Merchant
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const name = document.getElementById('m-name').value.trim();
+      const type = document.getElementById('m-type').value;
+      const phone = document.getElementById('m-phone').value.trim();
+      const password = document.getElementById('m-password').value.trim();
+      const bkash = document.getElementById('m-bkash').value.trim();
+      const district = document.getElementById('m-district').value;
+      const upazila = document.getElementById('m-upazila').value;
+      const village = document.getElementById('m-village').value.trim();
+
+      if(!name || !type || !phone || !password || !bkash || !village) {
+        Swal.fire('অসম্পূর্ণ ফর্ম', 'সবগুলো তথ্য সঠিকভাবে প্রদান করুন।', 'warning');
+        return;
+      }
+
+      const snap = await get(ref(db, `merchants/${phone}`));
+      if(snap.exists()) {
+        Swal.fire('নিবন্ধন ব্যর্থ', 'এই নাম্বারে ইতিমধ্যে মার্চেন্ট অ্যাকাউন্ট রয়েছে।', 'error');
+        return;
+      }
+
+      await set(ref(db, `merchants/${phone}`), {
+        name, type, phone, password, bkash, district, upazila, location: village, image: uploadedLogoUrl || ""
+      });
+
+      Swal.fire('সফল!', 'মার্চেন্ট অ্যাকাউন্ট তৈরি হয়েছে।', 'success');
+      switchPage('page-login');
+    });
+
+    // Login Merchant
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const phone = document.getElementById('login-phone').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+
+      if(!phone || !password) {
+        Swal.fire('ত্রুটি', 'মোবাইল ও পাসওয়ার্ড লিখুন।', 'warning');
+        return;
+      }
+
+      const snap = await get(ref(db, `merchants/${phone}`));
+      if(snap.exists() && snap.val().password === password) {
+        currentMerchant = snap.val();
+        merchantPhone = phone;
+        setupDashboard();
+      } else {
+        Swal.fire('ব্যর্থ', 'মোবাইল বা পাসওয়ার্ড ভুল হয়েছে।', 'error');
+      }
+    });
+
+    function setupDashboard() {
+      switchPage('page-dashboard');
+      document.getElementById('merchant-title').innerText = currentMerchant.name;
+
+      if(currentMerchant.type === 'bus') {
+        document.getElementById('panel-bus').classList.remove('hidden');
+        listenBusRequests();
+      } else {
+        document.getElementById('panel-food').classList.remove('hidden');
+        listenFoodOrders();
+      }
+    }
+
+    // --- BUS TRIP MANAGER ---
+    document.getElementById('btn-add-bus').addEventListener('click', async () => {
+      const routeFrom = document.getElementById('bus-from').value.trim();
+      const routeTo = document.getElementById('bus-to').value.trim();
+      const date = document.getElementById('bus-date').value;
+      const time = document.getElementById('bus-time').value;
+      const price = document.getElementById('bus-price').value.trim();
+      const fileInput = document.getElementById('bus-img');
+
+      if(!routeFrom || !routeTo || !date || !time || !price) {
+        Swal.fire('তথ্য বাকি', 'সবগুলো ফিল্ড পূরণ করুন।', 'warning');
+        return;
+      }
+
+      Swal.fire({ title: 'আপলোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+
+      let busImageUrl = "";
+      if(fileInput.files[0]) {
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+        const result = await res.json();
+        busImageUrl = result.success ? result.data.url : "";
+      }
+
+      const busId = push(ref(db, 'buses')).key;
+      await set(ref(db, `buses/${busId}`), {
+        merchantId: merchantPhone,
+        busName: currentMerchant.name,
+        routeFrom, routeTo, date, time, price, busImage: busImageUrl
+      });
+
+      Swal.close();
+      Swal.fire('সফল!', 'নতুন বাসের ট্রিপ যোগ হয়েছে।', 'success');
+    });
+
+    function listenBusRequests() {
+      onValue(ref(db, 'tickets'), (snap) => {
+        const listDiv = document.getElementById('bus-requests-list');
+        listDiv.innerHTML = "";
+        if(snap.exists()) {
+          snap.forEach((child) => {
+            const req = child.val();
+            if(req.status === 'pending') {
+              // Confirm if this bus belongs to current merchant
+              get(ref(db, `buses/${req.busId}`)).then((busSnap) => {
+                if(busSnap.exists() && busSnap.val().merchantId === merchantPhone) {
+                  listDiv.innerHTML += `
+                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-2 text-xs">
+                      <p><strong>যাত্রী:</strong> ${req.userName} (${req.userId})</p>
+                      <p><strong>সিট:</strong> ${req.seatNo} | <strong>মূল্য:</strong> ৳${req.price}</p>
+                      <p><strong>পেমেন্ট ফোন:</strong> ${req.senderPhone} | <strong>TxID:</strong> ${req.txId}</p>
+                      <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="approveTicket('${child.key}', '${req.busId}', '${req.seatNo}')" class="bg-emerald-600 text-white font-bold py-1.5 rounded-md">অ্যাপ্রুভ করুন</button>
+                        <button onclick="rejectTicket('${child.key}')" class="bg-red-500 text-white py-1.5 rounded-md">বাতিল</button>
+                      </div>
+                    </div>
+                  `;
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+
+    window.approveTicket = async function(ticketId, busId, seatNo) {
+      await update(ref(db, `tickets/${ticketId}`), { status: 'confirmed' });
+      await update(ref(db, `buses/${busId}/bookedSeats`), { [seatNo]: true });
+      Swal.fire('অনুমোদিত', 'টিকিটটি সফলভাবে কনফার্ম করা হয়েছে।', 'success');
+    };
+
+    window.rejectTicket = async function(ticketId) {
+      await update(ref(db, `tickets/${ticketId}`), { status: 'rejected' });
+      Swal.fire('বাতিল', 'টিকিট রিকোয়েস্ট বাতিল করা হয়েছে।', 'info');
+    };
+
+    // --- FOOD MENU MANAGER ---
+    document.getElementById('btn-add-item').addEventListener('click', async () => {
+      const name = document.getElementById('item-name').value.trim();
+      const price = document.getElementById('item-price').value.trim();
+      const fileInput = document.getElementById('item-img');
+
+      if(!name || !price) {
+        Swal.fire('অসম্পূর্ণ', 'আইটেমের নাম ও মূল্য লিখুন।', 'warning');
+        return;
+      }
+
+      Swal.fire({ title: 'যোগ করা হচ্ছে...', didOpen: () => Swal.showLoading() });
+
+      let itemImageUrl = "";
+      if(fileInput.files[0]) {
+        const fd = new FormData();
+        fd.append("image", fileInput.files[0]);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: fd });
+        const result = await res.json();
+        itemImageUrl = result.success ? result.data.url : "";
+      }
+
+      const itemKey = push(ref(db, `menu_items/${merchantPhone}`)).key;
+      await set(ref(db, `menu_items/${merchantPhone}/${itemKey}`), { name, price, image: itemImageUrl });
+
+      Swal.close();
+      Swal.fire('সফল', 'আইটেমটি মেনুতে যুক্ত হয়েছে।', 'success');
+    });
+
+    function listenFoodOrders() {
+      onValue(ref(db, 'orders'), (snap) => {
+        const listDiv = document.getElementById('food-orders-list');
+        listDiv.innerHTML = "";
+        if(snap.exists()) {
+          snap.forEach((child) => {
+            const order = child.val();
+            if(order.merchantId === merchantPhone && order.status === 'pending') {
+              listDiv.innerHTML += `
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-2 text-xs shadow-sm">
+                  <p class="font-bold text-gray-800">অর্ডার: ${order.itemName} (৳${order.price})</p>
+                  <p><strong>কাস্টমার:</strong> ${order.userName} (${order.userId})</p>
+                  <p><strong>ঠিকানা:</strong> ${order.address}</p>
+                  <button onclick="acceptFoodOrder('${child.key}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-md mt-1 transition-all">অর্ডার কনফার্ম ও রাইডার খুঁজুন</button>
+                </div>
+              `;
+            }
+          });
+        }
+      });
+    }
+
+    window.acceptFoodOrder = async function(orderId) {
+      await update(ref(db, `orders/${orderId}`), { status: 'delivery_broadcast' });
+      Swal.fire('কনফার্মড!', 'ডেলিভারি রাইডারের জন্য রিকোয়েস্ট পাঠানো হয়েছে।', 'success');
+    };
+  </script>
+</body>
+</html>
