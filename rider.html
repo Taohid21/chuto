@@ -7,7 +7,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Anek+Bangla:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- SweetAlert2 for Popups -->
@@ -15,7 +15,7 @@
   
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', 'Anek Bangla', sans-serif;
       background-color: #f3f4f6;
     }
     .mobile-shell {
@@ -25,6 +25,8 @@
       background-color: #ffffff;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
     .app-page {
       display: none;
@@ -42,7 +44,7 @@
   <div class="mobile-shell">
 
     <!-- A. RIDER REGISTER (Opens First) -->
-    <div id="page-register" class="app-page active p-6 justify-center">
+    <div id="page-register" class="app-page active p-6 justify-center bg-white">
       <div class="w-full max-w-sm mx-auto space-y-5">
         <div class="text-center space-y-1">
           <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-blue-50 text-blue-600 mb-1">
@@ -142,7 +144,7 @@
     </div>
 
     <!-- B. RIDER LOGIN -->
-    <div id="page-login" class="app-page p-6 justify-center">
+    <div id="page-login" class="app-page p-6 justify-center bg-white">
       <div class="w-full max-w-sm mx-auto space-y-6">
         <div class="text-center space-y-1">
           <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-blue-50 text-blue-600 mb-1">
@@ -176,9 +178,9 @@
       </div>
     </div>
 
-    <!-- C. DASHBOARD (Protected View) -->
+    <!-- C. DASHBOARD -->
     <div id="page-dashboard" class="app-page bg-white">
-      <header class="px-4 py-3 flex justify-between items-center border-b border-gray-100">
+      <header class="px-4 py-3 flex justify-between items-center border-b border-gray-100 sticky top-0 bg-white z-10 shadow-sm">
         <div class="flex items-center space-x-1.5">
           <i class="fa-solid fa-motorcycle text-blue-600 text-lg"></i>
           <span id="rider-title" class="font-bold text-sm text-gray-800">রাইডার ড্যাশবোর্ড</span>
@@ -186,22 +188,69 @@
         <button onclick="location.reload()" class="text-red-500 text-xs font-semibold"><i class="fa-solid fa-power-off"></i> লগআউট</button>
       </header>
 
-      <!-- Active Tasks & Job requests -->
-      <div class="p-4 flex-grow overflow-y-auto space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-gray-700 text-xs">চলতি কাজের অনুরোধ সমূহ</h3>
-          <span class="inline-block bg-blue-100 text-blue-800 text-[9px] font-bold px-2 py-0.5 rounded-full">বাউফল এরিয়া</span>
-        </div>
+      <!-- Dashboard Contents -->
+      <div class="p-4 flex-grow overflow-y-auto space-y-4 pb-12">
         
-        <div id="jobs-list" class="space-y-3">
-          <!-- Dynamic job list cards load here -->
+        <!-- Live Earnings Section (Calculated dynamically) -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-4 text-white shadow-md space-y-3.5">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-xs"><i class="fa-solid fa-wallet mr-1.5 text-yellow-300"></i>আজকের হিসাব ও ক্যাশ জমা</h4>
+            <span class="text-[9px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">ডেলিভারি চার্জ: ৳২৫</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3.5 text-center">
+            <div class="bg-white/10 p-2.5 rounded-xl">
+              <p class="text-[9px] text-blue-200">আজকের ডেলিভারি</p>
+              <p id="calc-count" class="text-lg font-bold">০ টি</p>
+            </div>
+            <div class="bg-white/10 p-2.5 rounded-xl">
+              <p class="text-[9px] text-blue-200">মোট সংগৃহীত ক্যাশ</p>
+              <p id="calc-collected" class="text-lg font-bold">৳০</p>
+            </div>
+            <div class="bg-white/10 p-2.5 rounded-xl">
+              <p class="text-[9px] text-yellow-300">আমার আয় (৳২৫ করে)</p>
+              <p id="calc-earnings" class="text-lg font-bold text-yellow-300">৳০</p>
+            </div>
+            <div class="bg-white/10 p-2.5 rounded-xl">
+              <p class="text-[9px] text-emerald-200">চুটো-কে পরিশোধযোগ্য</p>
+              <p id="calc-payable" class="text-lg font-bold text-emerald-200">৳০</p>
+            </div>
+          </div>
+
+          <!-- Cash Submission to Chuto Admin -->
+          <div class="bg-white/10 p-3.5 rounded-xl border border-white/10 space-y-2 text-xs">
+            <p class="font-bold text-[10px] text-yellow-300 border-b border-white/10 pb-1">রাত ৮টা - ৯টার মধ্যে বিকাশ করুন</p>
+            <p class="text-[10px]">চুটো বিকাশ নাম্বার (পার্সোনাল): <strong class="text-yellow-300 select-all">০১৭০০০০০০০০</strong></p>
+            
+            <div class="grid grid-cols-2 gap-2 text-gray-800 pt-1">
+              <input type="tel" id="submit-sender" placeholder="বিকাশ নাম্বার" class="px-2.5 py-1.5 rounded text-[10px] focus:outline-none">
+              <input type="text" id="submit-txid" placeholder="TxID দিন" class="px-2.5 py-1.5 rounded text-[10px] focus:outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-gray-800">
+              <input type="number" id="submit-amount" placeholder="টাকার পরিমাণ" class="px-2.5 py-1.5 rounded text-[10px] focus:outline-none">
+              <button onclick="submitCashToChuto()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-1.5 rounded text-[10px] uppercase transition">সাবমিট করুন</button>
+            </div>
+          </div>
         </div>
+
+        <!-- Job requests list -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-gray-700 text-xs">চলতি কাজের অনুরোধ সমূহ</h3>
+            <span class="inline-block bg-blue-100 text-blue-800 text-[9px] font-bold px-2 py-0.5 rounded-full">বাউফল এরিয়া</span>
+          </div>
+          
+          <div id="jobs-list" class="space-y-3">
+            <!-- Dynamic job cards -->
+          </div>
+        </div>
+
       </div>
     </div>
 
   </div>
 
-  <!-- Firebase & Scripts -->
+  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -234,7 +283,6 @@
       }
     };
 
-    // Show vehicle input only if "Ride Sharing" category is chosen
     document.getElementById('r-category').addEventListener('change', (e) => {
       const specs = document.getElementById('vehicle-specs');
       if(e.target.value === 'ride') {
@@ -244,7 +292,6 @@
       }
     });
 
-    // Profile Photo Upload
     document.getElementById('r-avatar').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if(!file) return;
@@ -264,12 +311,10 @@
           document.getElementById('avatar-preview').innerHTML = `<i class="fa-solid fa-camera text-gray-400"></i>`;
         }
       } catch (err) {
-        console.error(err);
         Swal.fire('ত্রুটি', 'ইন্টারনেট কানেকশন চেক করুন।', 'error');
       }
     });
 
-    // Register Rider
     document.getElementById('btn-register').addEventListener('click', async () => {
       const name = document.getElementById('r-name').value.trim();
       const category = document.getElementById('r-category').value;
@@ -282,7 +327,7 @@
       const village = document.getElementById('r-village').value.trim();
 
       if(!name || !category || !phone || !password || !village || !uploadedRiderPhotoUrl) {
-        Swal.fire('অসম্পূর্ণ ফর্ম', 'প্রোফাইল ছবি এবং সমস্ত তথ্য প্রদান করা বাধ্যতামূলক।', 'warning');
+        Swal.fire('অসম্পূর্ণ ফর্ম', 'ছবি এবং সমস্ত তথ্য প্রদান করা বাধ্যতামূলক।', 'warning');
         return;
       }
 
@@ -300,7 +345,6 @@
       switchPage('page-login');
     });
 
-    // Login Rider
     document.getElementById('btn-login').addEventListener('click', async () => {
       const phone = document.getElementById('login-phone').value.trim();
       const password = document.getElementById('login-password').value.trim();
@@ -328,8 +372,67 @@
         listenRideJobs();
       } else {
         listenDeliveryJobs();
+        calculateDeliveryFinance();
       }
     }
+
+    // Dynamic Live Earnings & Cash calculation
+    function calculateDeliveryFinance() {
+      onValue(ref(db, 'orders'), (snap) => {
+        let count = 0;
+        let totalCollected = 0;
+        let earnings = 0;
+        let payableToChuto = 0;
+
+        if (snap.exists()) {
+          snap.forEach((child) => {
+            const order = child.val();
+            // Count completed orders by this rider
+            if (order.status === 'completed' && order.riderPhone === riderPhoneKey) {
+              count++;
+              const price = parseFloat(order.price) || 0;
+              const deliveryFee = 25; // 25 TK flat delivery
+              totalCollected += (price + deliveryFee);
+              earnings += deliveryFee;
+              payableToChuto += price;
+            }
+          });
+        }
+
+        document.getElementById('calc-count').innerText = `${count} টি`;
+        document.getElementById('calc-collected').innerText = `৳${totalCollected}`;
+        document.getElementById('calc-earnings').innerText = `৳${earnings}`;
+        document.getElementById('calc-payable').innerText = `৳${payableToChuto}`;
+      });
+    }
+
+    // Submit Cash payment details to Chuto Admin
+    window.submitCashToChuto = async function() {
+      const sender = document.getElementById('submit-sender').value.trim();
+      const txid = document.getElementById('submit-txid').value.trim();
+      const amount = document.getElementById('submit-amount').value.trim();
+
+      if(!sender || !txid || !amount) {
+        Swal.fire('অসম্পূর্ণ তথ্য', 'বিকাশ নম্বর, TxID এবং টাকা দিন।', 'warning');
+        return;
+      }
+
+      const submissionId = push(ref(db, 'rider_payments')).key;
+      await set(ref(db, `rider_payments/${submissionId}`), {
+        riderPhone: riderPhoneKey,
+        riderName: currentRider.name,
+        senderNumber: sender,
+        txId: txid,
+        amount: parseFloat(amount),
+        status: 'pending',
+        timestamp: Date.now()
+      });
+
+      Swal.fire('সফল!', 'টাকা পাঠানোর তথ্য জমা হয়েছে। এডমিন যাচাই করে অ্যাপ্রুভ করবেন।', 'success');
+      document.getElementById('submit-sender').value = "";
+      document.getElementById('submit-txid').value = "";
+      document.getElementById('submit-amount').value = "";
+    };
 
     // --- RIDE JOBS HANDLER ---
     function listenRideJobs() {
@@ -375,7 +478,7 @@
         riderPlate: currentRider.vehiclePlate || 'N/A',
         tripStatus: 'আসার পথে'
       });
-      Swal.fire('রাইড গৃহীত', 'সফলভাবে রাইডটি গ্রহণ করেছেন। অবিলম্বে যাত্রীর ঠিকানায় যান।', 'success');
+      Swal.fire('রাইড গৃহীত', 'সফলভাবে রাইডটি গ্রহণ করেছেন। যাত্রীর ঠিকানায় যান।', 'success');
     };
 
     window.updateRideStatus = async function(rideId, text) {
@@ -401,6 +504,7 @@
                 <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-2 text-xs">
                   <p class="font-bold text-gray-800">পণ্য ডেলিভারি রিকোয়েস্ট</p>
                   <p><strong>আইটেম:</strong> ${order.itemName}</p>
+                  <p><strong>মূল্য:</strong> ৳${order.price} (+২৫ ডেলিভারি চার্জ)</p>
                   <p><strong>গ্রাহকের ঠিকানা:</strong> ${order.address}</p>
                   <button onclick="acceptDelivery('${child.key}')" class="w-full bg-blue-600 text-white font-bold py-1.5 rounded-md">ডেলিভারি শুরু করুন</button>
                 </div>
@@ -411,7 +515,8 @@
                   <p class="font-bold text-yellow-800">ডেলিভারি প্রসেসিং (৩০ মিনিট সীমা)</p>
                   <p><strong>আইটেম:</strong> ${order.itemName} | <strong>মূল্য:</strong> ৳${order.price}</p>
                   <p><strong>গ্রাহক:</strong> ${order.userName} | <strong>ঠিকানা:</strong> ${order.address}</p>
-                  <button onclick="completeDelivery('${child.key}')" class="w-full bg-green-600 text-white font-bold py-1.5 rounded-md mt-1">ডেলিভারি সফল ও ক্যাশ বুঝে পেয়েছি</button>
+                  <p class="text-blue-800 font-bold bg-blue-50 p-2.5 rounded border border-blue-100 text-center text-[11px] mt-1">কাস্টমারের থেকে মোট সংগৃহীত করবেন: ৳${parseFloat(order.price) + 25}</p>
+                  <button onclick="completeDelivery('${child.key}')" class="w-full bg-green-600 text-white font-bold py-1.5 rounded-md mt-2">ডেলিভারি সফল ও ক্যাশ বুঝে পেয়েছি</button>
                 </div>
               `;
             }
@@ -426,12 +531,12 @@
         riderPhone: riderPhoneKey,
         riderName: currentRider.name
       });
-      Swal.fire('ডেলিভারি গৃহীত', 'অনতিবিলম্বে রেস্টুরেন্ট/দোকান থেকে পার্সেলটি সংগ্রহ করুন।', 'success');
+      Swal.fire('ডেলিভারি গৃহীত', 'দোকান/রেস্টুরেন্ট থেকে পার্সেলটি সংগ্রহ করুন।', 'success');
     };
 
     window.completeDelivery = async function(orderId) {
       await update(ref(db, `orders/${orderId}`), { status: 'completed' });
-      Swal.fire('সফল!', 'ডেলিভারিটি সফলভাবে সম্পন্ন হয়েছে।', 'success');
+      Swal.fire('সফল!', 'ডেলিভারিটি সফলভাবে সম্পন্ন হয়েছে। ক্যাশ হিসাব যুক্ত হয়েছে।', 'success');
     };
   </script>
 </body>
