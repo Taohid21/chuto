@@ -7,7 +7,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Anek+Bangla:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- SweetAlert2 for Popups -->
@@ -15,7 +15,7 @@
   
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', 'Anek Bangla', sans-serif;
       background-color: #f3f4f6;
     }
     .mobile-shell {
@@ -25,6 +25,8 @@
       background-color: #ffffff;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
     .app-page {
       display: none;
@@ -42,7 +44,7 @@
   <div class="mobile-shell">
 
     <!-- A. MERCHANT REGISTER (Opens First) -->
-    <div id="page-register" class="app-page active p-6 justify-center">
+    <div id="page-register" class="app-page active p-6 justify-center bg-white">
       <div class="w-full max-w-sm mx-auto space-y-5">
         <div class="text-center space-y-1">
           <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 mb-1">
@@ -133,7 +135,7 @@
     </div>
 
     <!-- B. MERCHANT LOGIN -->
-    <div id="page-login" class="app-page p-6 justify-center">
+    <div id="page-login" class="app-page p-6 justify-center bg-white">
       <div class="w-full max-w-sm mx-auto space-y-6">
         <div class="text-center space-y-1">
           <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 mb-1">
@@ -167,10 +169,10 @@
       </div>
     </div>
 
-    <!-- C. DASHBOARD (Protected view) -->
+    <!-- C. DASHBOARD -->
     <div id="page-dashboard" class="app-page bg-white">
       <!-- Navbar -->
-      <header class="px-4 py-3 flex justify-between items-center border-b border-gray-100">
+      <header class="px-4 py-3 flex justify-between items-center border-b border-gray-100 sticky top-0 bg-white z-10 shadow-sm">
         <div class="flex items-center space-x-1.5">
           <i class="fa-solid fa-store text-emerald-600 text-lg"></i>
           <span id="merchant-title" class="font-bold text-sm text-gray-800">মার্চেন্ট ড্যাশবোর্ড</span>
@@ -204,13 +206,41 @@
         <div class="space-y-2">
           <h3 class="font-bold text-gray-700 text-xs">পেন্ডিং বুকিং রিকোয়েস্ট সমূহ</h3>
           <div id="bus-requests-list" class="space-y-2">
-            <!-- Dynamic request cards go here -->
+            <!-- Dynamic request cards -->
           </div>
         </div>
       </div>
 
       <!-- 2. FOOD & GROCERY DASHBOARD ACTIONS -->
-      <div id="panel-food" class="hidden p-4 space-y-4 flex-grow overflow-y-auto">
+      <div id="panel-food" class="hidden p-4 space-y-4 flex-grow overflow-y-auto pb-12">
+        
+        <!-- Live Ledger / Financial Statement (10% Commission Calculations) -->
+        <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-4 rounded-2xl shadow-md space-y-3 text-xs">
+          <div class="flex justify-between items-center border-b border-white/10 pb-1.5">
+            <h4 class="font-bold"><i class="fa-solid fa-calculator mr-1 text-yellow-300"></i>আজকের হিসাব ও পাওনা বিবরণী</h4>
+            <span class="bg-white/20 px-2 py-0.5 rounded text-[8px] uppercase">কমিশন: ১০%</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2.5 text-center">
+            <div class="bg-white/10 p-2 rounded-lg">
+              <p class="text-[9px] text-teal-100">আজকের বিক্রয়</p>
+              <p id="ledger-sales" class="text-sm font-bold">৳০</p>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <p class="text-[9px] text-red-200">চুটো কমিশন</p>
+              <p id="ledger-commission" class="text-sm font-bold text-red-200">-৳০</p>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <p class="text-[9px] text-yellow-200">নিট পাওনা</p>
+              <p id="ledger-payable" class="text-sm font-bold text-yellow-200">৳০</p>
+            </div>
+          </div>
+          
+          <div class="bg-white/5 p-2 rounded-lg text-[9px] text-teal-100 border border-white/5">
+            <p><i class="fa-solid fa-info-circle mr-1"></i>রাইডারের ক্যাশ বুঝে পাওয়ার পর, এডমিন প্যানেল থেকে কমিশন ১০% কেটে আপনার বিকাশ নম্বরে প্রতিদিনের পাওনা স্বয়ংক্রিয়ভাবে পরিশোধ করা হবে।</p>
+          </div>
+        </div>
+
         <!-- Add Menu Item Form -->
         <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
           <h3 class="font-bold text-gray-800 text-xs border-b pb-1.5"><i class="fa-solid fa-hamburger mr-1 text-emerald-600"></i>মেনুতে নতুন আইটেম যোগ করুন</h3>
@@ -228,7 +258,7 @@
         <div class="space-y-2">
           <h3 class="font-bold text-gray-700 text-xs">চলতি কাস্টমার অর্ডার সমূহ</h3>
           <div id="food-orders-list" class="space-y-2">
-            <!-- Dynamic order cards go here -->
+            <!-- Dynamic order cards -->
           </div>
         </div>
       </div>
@@ -236,7 +266,7 @@
 
   </div>
 
-  <!-- Firebase & Scripts -->
+  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -269,7 +299,6 @@
       }
     };
 
-    // ImgBB Upload Handler
     document.getElementById('m-logo').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if(!file) return;
@@ -289,12 +318,10 @@
           document.getElementById('logo-preview').innerHTML = `<i class="fa-solid fa-camera text-gray-400"></i>`;
         }
       } catch (err) {
-        console.error(err);
         Swal.fire('কানেকশন এরর', 'ইন্টারনেট চেক করুন।', 'error');
       }
     });
 
-    // Register Merchant
     document.getElementById('btn-register').addEventListener('click', async () => {
       const name = document.getElementById('m-name').value.trim();
       const type = document.getElementById('m-type').value;
@@ -324,7 +351,6 @@
       switchPage('page-login');
     });
 
-    // Login Merchant
     document.getElementById('btn-login').addEventListener('click', async () => {
       const phone = document.getElementById('login-phone').value.trim();
       const password = document.getElementById('login-password').value.trim();
@@ -354,7 +380,37 @@
       } else {
         document.getElementById('panel-food').classList.remove('hidden');
         listenFoodOrders();
+        calculateMerchantLedger();
       }
+    }
+
+    // Dynamic Live Ledger / Payout Statement Calculations
+    function calculateMerchantLedger() {
+      onValue(ref(db, 'orders'), (snap) => {
+        let grossSales = 0;
+        let totalCommission = 0;
+        let netPayable = 0;
+
+        if (snap.exists()) {
+          snap.forEach((child) => {
+            const order = child.val();
+            // Filter completed orders from this merchant
+            if (order.merchantId === merchantPhone && order.status === 'completed') {
+              const price = parseFloat(order.price) || 0;
+              const comm = price * 0.10; // 10% commission on item cost
+              const net = price - comm;
+
+              grossSales += price;
+              totalCommission += comm;
+              netPayable += net;
+            }
+          });
+        }
+
+        document.getElementById('ledger-sales').innerText = `৳${grossSales}`;
+        document.getElementById('ledger-commission').innerText = `-৳${totalCommission}`;
+        document.getElementById('ledger-payable').innerText = `৳${netPayable}`;
+      });
     }
 
     // --- BUS TRIP MANAGER ---
@@ -371,7 +427,7 @@
         return;
       }
 
-      Swal.fire({ title: 'আপলোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+      Swal.fire({ title: '업로드 হচ্ছে...', didOpen: () => Swal.showLoading() });
 
       let busImageUrl = "";
       if(fileInput.files[0]) {
@@ -401,7 +457,6 @@
           snap.forEach((child) => {
             const req = child.val();
             if(req.status === 'pending') {
-              // Confirm if this bus belongs to current merchant
               get(ref(db, `buses/${req.busId}`)).then((busSnap) => {
                 if(busSnap.exists() && busSnap.val().merchantId === merchantPhone) {
                   listDiv.innerHTML += `
@@ -470,15 +525,50 @@
         if(snap.exists()) {
           snap.forEach((child) => {
             const order = child.val();
-            if(order.merchantId === merchantPhone && order.status === 'pending') {
-              listDiv.innerHTML += `
-                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-2 text-xs shadow-sm">
-                  <p class="font-bold text-gray-800">অর্ডার: ${order.itemName} (৳${order.price})</p>
-                  <p><strong>কাস্টমার:</strong> ${order.userName} (${order.userId})</p>
-                  <p><strong>ঠিকানা:</strong> ${order.address}</p>
-                  <button onclick="acceptFoodOrder('${child.key}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-md mt-1 transition-all">অর্ডার কনফার্ম ও রাইডার খুঁজুন</button>
-                </div>
-              `;
+            if(order.merchantId === merchantPhone) {
+              
+              // 1. Pending Customer orders
+              if (order.status === 'pending') {
+                listDiv.innerHTML += `
+                  <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-2 text-xs shadow-sm">
+                    <p class="font-bold text-gray-800">অর্ডার: ${order.itemName} (৳${order.price})</p>
+                    <p><strong>কাস্টমার:</strong> ${order.userName} (${order.userId})</p>
+                    <p><strong>ঠিকানা:</strong> ${order.address}</p>
+                    <button onclick="acceptFoodOrder('${child.key}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-md mt-1 transition-all">অর্ডার কনফার্ম ও রাইডার খুঁজুন</button>
+                  </div>
+                `;
+              } 
+              // 2. Active orders already accepted or completed
+              else {
+                let payoutBadge = "";
+                let itemCost = parseFloat(order.price) || 0;
+                let calculatedNet = itemCost - (itemCost * 0.10); // Net 90% payout display
+
+                if (order.status === 'completed') {
+                  const statusLabel = order.payoutStatus === 'paid' 
+                    ? `<span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold text-[9px]"><i class="fa-solid fa-circle-check mr-1"></i>এডমিন পেইড (TxID: ${order.payoutTxId || 'N/A'})</span>`
+                    : `<span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-bold text-[9px]"><i class="fa-solid fa-clock mr-1"></i>এডমিন পেমেন্ট পেন্ডিং</span>`;
+                  
+                  payoutBadge = `
+                    <div class="mt-2 pt-2 border-t border-dashed flex justify-between items-center text-[10px]">
+                      <span>১০% কমিশন বাদে আপনার পাওনা: <strong>৳${calculatedNet}</strong></span>
+                      ${statusLabel}
+                    </div>
+                  `;
+                }
+
+                listDiv.innerHTML += `
+                  <div class="p-3 bg-white border border-gray-150 rounded-xl space-y-1 text-xs shadow-sm">
+                    <div class="flex justify-between items-center">
+                      <p class="font-bold text-gray-700">${order.itemName} (৳${order.price})</p>
+                      <span class="text-[9px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded font-semibold uppercase">${order.status}</span>
+                    </div>
+                    <p class="text-[10px] text-gray-400">গ্রাহক: ${order.userName} | ডেলিভারি: ${order.riderName || 'অপেক্ষমান'}</p>
+                    ${payoutBadge}
+                  </div>
+                `;
+              }
+
             }
           });
         }
