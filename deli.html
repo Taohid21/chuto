@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuto Delivery | ডেলিভারিম্যান কন্ট্রোল প্যানেল</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts (Plus Jakarta Sans & Hind Siliguri) -->
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    body {
+      font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+      background-color: #030408;
+      overflow-x: hidden;
+    }
+    .poppins-font {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    /* Perfect App Shell Frame */
+    .mobile-shell {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100vh;
+      background: linear-gradient(180deg, #070913 0%, #0c0e1a 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      color: #f3f4f6;
+    }
+
+    @media (min-width: 640px) {
+      .mobile-shell {
+        height: 860px;
+        margin: 20px auto;
+        border-radius: 40px;
+        border: 10px solid #1e293b;
+        box-shadow: 0 25px 60px -15px rgba(255, 90, 0, 0.15), 0 0 0 1px rgba(255,255,255,0.04);
+      }
+    }
+
+    .app-page {
+      display: none;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .app-page.active {
+      display: flex;
+      flex-direction: column;
+      animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Tab Contents and Custom Scrollable Area */
+    .tab-scroll-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 120px; /* Safe distance for floating nav */
+    }
+
+    .dash-tab-content {
+      display: none;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .dash-tab-content.active {
+      display: block;
+    }
+
+    /* CSS Animations */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes pulseAlert {
+      0%, 100% { border-color: rgba(245, 158, 11, 0.2); box-shadow: 0 0 0 0px rgba(245, 158, 11, 0); }
+      50% { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 0 12px 0px rgba(245, 158, 11, 0.15); }
+    }
+
+    .pulsing-alert-card {
+      animation: pulseAlert 2.5s infinite;
+    }
+
+    /* Custom Hide Scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Fixed Premium Glassmorphism Navigation Bar */
+    .fixed-glass-nav {
+      position: absolute;
+      bottom: 20px;
+      left: 16px;
+      right: 16px;
+      height: 72px;
+      backdrop-filter: blur(24px);
+      background-color: rgba(13, 18, 35, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 8px;
+    }
+
+    /* Active Tab Glow Indicator */
+    .nav-btn-active-pill {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(244, 63, 94, 0.15) 100%);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+    }
+  </style>
+</head>
+<body class="no-scrollbar">
+
+  <!-- Background alert sound on pending jobs [2] -->
+  <audio id="job-alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-84.wav" preload="auto" loop></audio>
+
+  <div class="mobile-shell shadow-2xl relative">
+
+    <!-- SPLASH SCREEN -->
+    <div id="page-splash" class="app-page active justify-center items-center p-6 bg-[#030408]">
+      <div class="text-center space-y-6">
+        <div class="relative w-24 h-24 rounded-[32px] bg-gradient-to-tr from-orange-500 to-rose-500 text-white flex items-center justify-center mx-auto shadow-xl shadow-orange-500/20 animate-bounce">
+          <i class="fa-solid fa-person-biking text-5xl"></i>
+          <span class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#030408]"></span>
+        </div>
+        <div class="space-y-2">
+          <h1 class="text-4xl font-extrabold text-white tracking-tight poppins-font bg-gradient-to-r from-orange-400 to-rose-400 bg-clip-text text-transparent">Chuto Delivery</h1>
+          <p class="text-[11px] text-zinc-400 font-bold tracking-widest uppercase">রেস্টুরেন্ট ও গ্রোসারি রাইডার প্যানেল</p>
+        </div>
+        <div class="pt-8">
+          <div class="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY MAN AUTH PAGE -->
+    <div id="page-auth" class="app-page p-6 justify-center items-center bg-[#070913]">
+      <div class="w-full max-w-sm bg-white/[0.03] backdrop-blur-md rounded-[32px] shadow-2xl overflow-hidden border border-white/[0.08] p-6 space-y-6">
+        
+        <!-- Tab Toggle Header -->
+        <div class="flex justify-between items-center border-b border-white/[0.06] pb-4">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+              <i class="fa-solid fa-bicycle text-lg"></i>
+            </div>
+            <span class="font-extrabold text-base text-white poppins-font">Rider Hub</span>
+          </div>
+          <button id="auth-toggle-btn" onclick="toggleAuthView()" class="text-xs font-bold text-orange-400 bg-orange-500/10 px-3.5 py-2 rounded-full transition-all hover:bg-orange-500/20 active:scale-95 border border-orange-500/20">
+            নতুন অ্যাকাউন্ট <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- LOGIN VIEW -->
+        <div id="auth-login-box" class="space-y-6">
+          <div class="text-left space-y-1.5">
+            <h2 class="text-2xl font-bold text-white tracking-tight">স্বাগতম রাইডার!</h2>
+            <p class="text-xs text-zinc-400 leading-relaxed">আপনার নিবন্ধিত মোবাইল নম্বর ও পাসওয়ার্ড ব্যবহার করে ড্যাশবোর্ড সচল করুন।</p>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="space-y-1.5">
+              <label class="block text-zinc-400 text-xs font-semibold">মোবাইল নাম্বার</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"><i class="fa-solid fa-phone"></i></span>
+                <input type="tel" id="login-phone" placeholder="017xxxxxxxx" class="w-full pl-11 pr-4 py-3.5 bg-black/40 border border-white/10 rounded-2xl focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 text-white poppins-font text-xs transition-all">
+              </div>
+            </div>
+            
+            <div class="space-y-1.5">
+              <label class="block text-zinc-400 text-xs font-semibold">পাসওয়ার্ড</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" id="login-password" placeholder="••••••••" class="w-full pl-11 pr-4 py-3.5 bg-black/40 border border-white/10 rounded-2xl focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 text-white poppins-font text-xs transition-all">
+              </div>
+            </div>
+          </div>
+          
+          <button id="btn-login" class="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:opacity-95 active:scale-95 text-white font-bold py-4 rounded-2xl text-xs transition-all shadow-lg shadow-orange-500/10">ড্যাশবোর্ডে প্রবেশ করুন</button>
+        </div>
+
+        <!-- REGISTER VIEW -->
+        <div id="auth-register-box" class="hidden space-y-5">
+          <div class="text-left space-y-1">
+            <h2 class="text-2xl font-bold text-white tracking-tight font-sans">নতুন রাইডার রেজিস্ট্রেশন</h2>
+            <p class="text-xs text-zinc-400">সহজ কিছু ধাপে চুটো ডেলিভারির রাইডার টিম-এ যোগ দিন।</p>
+          </div>
+          
+          <!-- Avatar Uploader -->
+          <div class="flex flex-col items-center justify-center py-2">
+            <label for="reg-avatar" class="cursor-pointer relative group">
+              <div id="avatar-preview" class="w-20 h-20 rounded-full bg-black/40 border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden group-hover:border-orange-500 transition-all duration-300 relative shadow-inner">
+                <i class="fa-solid fa-camera text-zinc-400 text-lg group-hover:scale-110 transition-transform"></i>
+              </div>
+              <div class="absolute -bottom-1 -right-1 bg-orange-500 w-6 h-6 rounded-full flex items-center justify-center border border-[#0d111d] shadow">
+                <i class="fa-solid fa-plus text-[10px] text-white"></i>
+              </div>
+            </label>
+            <input type="file" id="reg-avatar" accept="image/*" class="hidden">
+            <span class="text-[10px] text-zinc-400 mt-2 font-medium">প্রোফাইল ফটো আপলোড করুন [2]</span>
+          </div>
+
+          <!-- Form inputs with clean styling and Custom Scrollbar -->
+          <div class="space-y-4 max-h-60 overflow-y-auto pr-1 no-scrollbar">
+            <div class="space-y-1.5">
+              <label class="block text-zinc-400 text-xs font-semibold">আপনার সম্পূর্ণ নাম</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"><i class="fa-solid fa-user"></i></span>
+                <input type="text" id="reg-name" placeholder="যেমন: রাসেল আহমেদ" class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-orange-500 transition-all">
+              </div>
+            </div>
+            
+            <div class="space-y-1.5">
+              <label class="block text-zinc-400 text-xs font-semibold">মোবাইল নাম্বার (লগইন আইডি)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"><i class="fa-solid fa-phone"></i></span>
+                <input type="tel" id="reg-phone" placeholder="017xxxxxxxx" class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-xs poppins-font focus:outline-none focus:border-orange-500 transition-all">
+              </div>
+            </div>
+            
+            <div class="space-y-1.5">
+              <label class="block text-zinc-400 text-xs font-semibold">বর্তমান ঠিকানা / এলাকা বিবরণ [2]</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"><i class="fa-solid fa-map-location-dot"></i></span>
+                <input type="text" id="reg-details" placeholder="যেমন: বাউফল সদর, থানা রোড" class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-orange-500 transition-all">
+              </div>
+            </div>
+            
+            <div class="space-y-1.5">
+              <label class="block text-zinc-400 text-xs font-semibold">পাসওয়ার্ড</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" id="reg-password" placeholder="সর্বনিম্ন ৬ ডিজিট দিন" class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white text-xs poppins-font focus:outline-none focus:border-orange-500 transition-all">
+              </div>
+            </div>
+          </div>
+          
+          <button id="btn-register" class="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:opacity-95 active:scale-95 text-white font-bold py-3.5 rounded-2xl text-xs transition-all shadow-lg shadow-orange-500/10">নিবন্ধন সম্পন্ন করুন</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="page-dashboard" class="app-page justify-between bg-[#080a10]">
+      
+      <!-- STICKY HEADER -->
+      <header class="px-5 py-4 flex justify-between items-center border-b border-white/[0.05] bg-[#080a10]/80 backdrop-blur-lg z-40 shadow-sm shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="relative">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-rose-500 p-[2px] shadow-md shadow-orange-500/10">
+              <div class="w-full h-full bg-[#0d111d] rounded-full overflow-hidden flex items-center justify-center">
+                <i class="fa-solid fa-user-ninja text-zinc-400 text-sm"></i>
+              </div>
+            </div>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#080a10]"></span>
+          </div>
+          <div>
+            <span id="header-rider-name" class="font-bold text-sm text-white tracking-tight block">ডেলিভারি ড্যাশবোর্ড</span>
+            <div class="flex items-center space-x-1.5">
+              <span id="header-rider-status" class="text-[10px] font-bold block text-green-400">সক্রিয় (Active)</span>
+            </div>
+          </div>
+        </div>
+        
+        <button onclick="logoutRider()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 transition-all active:scale-90" title="লগআউট">
+          <i class="fa-solid fa-power-off text-sm"></i>
+        </button>
+      </header>
+
+      <!-- SCROLLABLE TAB CONTAINER -->
+      <div class="tab-scroll-container no-scrollbar">
+
+        <!-- DYNAMIC WARNING BANNER (BD TIMEZONE) -->
+        <div id="custom-time-warning-banner" class="hidden m-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-300 text-xs font-semibold space-y-1 pulsing-alert-card">
+          <div class="flex items-center space-x-2 text-amber-400">
+            <i class="fa-solid fa-bell animate-swing"></i>
+            <p class="font-bold">আজকের বকেয়া পরিশোধের সময়সীমা সতর্কবার্তা!</p>
+          </div>
+          <p class="text-[10.5px] text-zinc-300 font-normal leading-relaxed pl-5">
+            সম্মানিত রাইডার, বাংলাদেশ সময় অনুযায়ী প্রতিদিন <strong>রাত ৮:০০ থেকে ৯:০০ টার মধ্যে</strong> আজকের বকেয়া টাকা জমা দেওয়া বাধ্যতামূলক। রাত ৯:০০ টার পর পেমেন্ট জমা না থাকলে ড্যাশবোর্ড লক হয়ে যাবে।
+          </p>
+        </div>
+
+        <!-- PAST DUE SUSPENDED BANNER (AUTO BLOCKED) -->
+        <div id="suspended-overlay" class="hidden m-4 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-300 text-xs font-semibold space-y-1.5">
+          <div class="flex items-center space-x-2 text-rose-400">
+            <i class="fa-solid fa-lock text-base animate-bounce"></i>
+            <p class="font-bold">অ্যাকাউন্ট সাময়িকভাবে লক করা হয়েছে!</p>
+          </div>
+          <p class="text-[10.5px] text-zinc-400 font-normal leading-relaxed pl-6">
+            গতকালকের অথবা পূর্ববর্তী দিনের বকেয়া খাবার বিক্রির টাকা যথাসময়ে পরিশোধ না করার কারণে আপনার অ্যাকাউন্টটি সিস্টেম থেকে <strong>লক (Locked)</strong> করা হয়েছে। বকেয়া পরিশোধ করে অনুগ্রহ করে ড্যাশবোর্ড সচল করুন।
+          </p>
+        </div>
+        
+        <div class="px-4 pt-2">
+          
+          <!-- Tab 1: FIND ORDERS (WITH AUTO-LOCK SCREEN MOCKUP) -->
+          <div id="tab-find" class="dash-tab-content active space-y-4 relative">
+            
+            <!-- Dashboard Lock Shield Overlay -->
+            <div id="board-lock-shield" class="hidden absolute inset-0 bg-[#080a10]/95 backdrop-blur-md z-40 rounded-3xl flex flex-col items-center justify-center text-center p-6 space-y-4 min-h-[300px]">
+              <div class="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 shadow-lg shadow-rose-500/10">
+                <i class="fa-solid fa-shield-halved text-2xl"></i>
+              </div>
+              <div class="space-y-1.5 max-w-[280px]">
+                <h4 class="text-base font-bold text-white">অর্ডার বোর্ড লকড</h4>
+                <p class="text-xs text-zinc-400 leading-relaxed">বকেয়া পেমেন্ট পরিশোধ না করা পর্যন্ত আপনি নতুন কোনো ডেলিভারি বা অর্ডার গ্রহণ করতে পারবেন না।</p>
+              </div>
+              <button onclick="switchDashTab('payouts')" class="bg-gradient-to-r from-orange-500 to-rose-500 text-white font-extrabold text-xs px-6 py-3 rounded-xl active:scale-95 transition-all shadow-md">বকেয়া জমা দিন (Pay Now)</button>
+            </div>
+
+            <!-- Home Tab Notification Button for Today's Stats -->
+            <div class="bg-gradient-to-tr from-orange-500/10 to-rose-500/10 border border-orange-500/20 p-4 rounded-3xl flex items-center justify-between shadow-xl relative overflow-hidden shrink-0">
+              <div class="absolute -right-6 -bottom-6 text-orange-500/[0.04] text-7xl font-black"><i class="fa-solid fa-motorcycle"></i></div>
+              <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
+                  <i class="fa-solid fa-calendar-day text-lg"></i>
+                </div>
+                <div>
+                  <span class="text-[9px] uppercase font-bold tracking-wider text-zinc-400 block mb-0.5">আজকের লাইভ সারাংশ</span>
+                  <div class="flex items-center space-x-1">
+                    <span id="home-today-count" class="text-white font-black text-sm poppins-font">০ টি ট্রিপ</span>
+                    <span class="text-zinc-600 text-xs">|</span>
+                    <span id="home-today-earnings" class="text-green-400 font-extrabold text-sm poppins-font">৳০ আয়</span>
+                  </div>
+                </div>
+              </div>
+              <span class="bg-green-500/10 border border-green-500/20 text-green-400 text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">রানিং</span>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-white/[0.06] pb-3 pt-2">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                <h3 class="font-bold text-white text-xs tracking-wider uppercase">লাইভ অর্ডার বোর্ড</h3>
+              </div>
+              <span class="bg-orange-500/10 text-orange-400 text-[10px] font-extrabold px-3 py-1 rounded-full border border-orange-500/20" id="live-requests-badge">০ টি পেন্ডিং</span>
+            </div>
+            
+            <div id="available-jobs-list" class="space-y-4">
+              <!-- Available jobs load dynamically -->
+            </div>
+          </div>
+
+          <!-- Tab 2: ACTIVE JOBS -->
+          <div id="tab-active" class="dash-tab-content space-y-4 relative">
+            
+            <!-- Active Jobs Lock Cover -->
+            <div id="active-lock-shield" class="hidden absolute inset-0 bg-[#080a10]/95 backdrop-blur-md z-40 rounded-3xl flex flex-col items-center justify-center text-center p-6 space-y-4 min-h-[300px]">
+              <i class="fa-solid fa-lock text-3xl text-rose-500"></i>
+              <p class="text-xs text-zinc-400 max-w-[260px]">বকেয়া পেমেন্ট পরিশোধ না করা পর্যন্ত রুট ট্র্যাকার ও ডেলিভারি পরিচালনা প্যানেলটি বন্ধ থাকবে।</p>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-white/[0.06] pb-3">
+              <h3 class="font-bold text-white text-xs tracking-wider uppercase">চলমান ডেলিভারি ও রুট ট্র্যাকার</h3>
+            </div>
+            
+            <div id="active-jobs-list" class="space-y-4">
+              <!-- Active tasks load dynamically -->
+            </div>
+          </div>
+
+          <!-- Tab 3: SETTLEMENTS & STATS -->
+          <div id="tab-payouts" class="dash-tab-content space-y-5 text-zinc-300">
+            
+            <!-- Lifetime Overall Stats (Top Card) -->
+            <div class="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-5 relative overflow-hidden">
+              <div class="absolute -right-8 -bottom-8 text-white/[0.02] text-8xl font-black"><i class="fa-solid fa-wallet"></i></div>
+              <div class="grid grid-cols-2 gap-4 border-b border-white/[0.04] pb-4 mb-4">
+                <div>
+                  <span class="text-zinc-500 text-[10px] block font-bold uppercase tracking-wider">সর্বমোট সম্পন্ন ট্রিপ</span>
+                  <span id="stat-total-count" class="text-xl font-extrabold text-white poppins-font mt-1 block">০ টি</span>
+                </div>
+                <div>
+                  <span class="text-zinc-500 text-[10px] block font-bold uppercase tracking-wider">সর্বমোট আয় (লাইফটাইম)</span>
+                  <span id="stat-total-earnings" class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-400 poppins-font mt-1 block">৳০</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-zinc-400 text-[10px] block font-bold uppercase tracking-wider">কোম্পানিকে প্রদেয় মোট বকেয়া</span>
+                  <span id="stat-company-due" class="text-2xl font-black text-amber-400 poppins-font mt-0.5 block">৳০</span>
+                </div>
+                <button onclick="switchDashTab('payouts')" class="bg-amber-500/10 border border-amber-500/20 text-amber-400 font-extrabold text-[10px] px-3.5 py-2 rounded-xl">পেমেন্ট করুন</button>
+              </div>
+            </div>
+
+            <!-- DAILY FINANCIAL BREAKDOWN SECTION -->
+            <div class="space-y-3">
+              <h4 class="font-extrabold text-white text-xs border-b border-white/[0.06] pb-2 uppercase tracking-wider">
+                <i class="fa-solid fa-calendar-days text-orange-500 mr-2"></i>দৈনিক হিসাব বিবরণী
+              </h4>
+              <div id="daily-accounting-breakdown-list" class="space-y-3">
+                <!-- Daily income & due list loads dynamically -->
+              </div>
+            </div>
+
+            <!-- Payout Submission Widget -->
+            <div class="bg-white/[0.02] border border-white/[0.06] rounded-[32px] p-5 space-y-4 relative">
+              <div class="border-b border-white/[0.06] pb-3 flex justify-between items-center">
+                <h4 class="font-extrabold text-white text-xs uppercase tracking-wider"><i class="fa-solid fa-paper-plane text-orange-500 mr-2"></i>পেমেন্ট সাবমিট করুন [2]</h4>
+                <span id="settlement-status-badge" class="bg-zinc-900 text-zinc-500 text-[8px] font-bold px-2.5 py-1 rounded-full border border-white/[0.06]">কোনো সাবমিশন নেই</span>
+              </div>
+
+              <!-- Copyable BKash Wallet -->
+              <div class="bg-black/40 p-4 rounded-2xl border border-white/[0.06] flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                  <div class="w-9 h-9 rounded-xl bg-[#e2125d]/10 flex items-center justify-center text-[#e2125d] font-black text-xs poppins-font">bK</div>
+                  <div>
+                    <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-wider">Chuto বিকাশ পার্সোনাল [2]</p>
+                    <p class="text-xs font-extrabold text-white poppins-font mt-0.5 tracking-wide" id="admin-payment-number">01704609401</p>
+                  </div>
+                </div>
+                <button onclick="copyPaymentNumber()" class="bg-white/[0.05] hover:bg-orange-500 hover:text-white border border-white/[0.08] text-zinc-300 font-extrabold px-3 py-2 rounded-xl text-[10px] transition-all active:scale-90">কপি করুন</button>
+              </div>
+
+              <!-- Submit Form inputs -->
+              <div class="space-y-3.5 text-xs">
+                <div class="space-y-1.5">
+                  <label class="block text-zinc-400 font-semibold pl-1">টাকা পাঠানোর পরিমাণ (৳) [2]</label>
+                  <input type="number" id="pay-amount" placeholder="যেমন: ৫০০" class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:border-orange-500 text-white poppins-font">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-zinc-400 font-semibold pl-1">আপনার বিকাশ সেন্ডার নম্বর</label>
+                  <input type="tel" id="pay-sender" placeholder="017XXXXXXXX" class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none text-white poppins-font" maxlength="11">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-zinc-400 font-semibold pl-1">ট্রানজেকশন আইডি (TxID)</label>
+                  <input type="text" id="pay-txid" placeholder="8N7X2Y9Z" class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none text-white poppins-font uppercase">
+                </div>
+              </div>
+
+              <button onclick="submitDailySettlement()" class="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:opacity-95 text-white font-extrabold py-3.5 rounded-2xl text-xs active:scale-95 transition-all shadow-lg shadow-orange-500/10">হিসাব বিবরণী সাবমিট করুন</button>
+            </div>
+
+            <!-- PREMIUM DETAILED TRIP HISTORY SECTION -->
+            <div class="space-y-3">
+              <div class="flex justify-between items-center border-b border-white/[0.06] pb-2">
+                <h4 class="font-extrabold text-white text-xs uppercase tracking-wider"><i class="fa-solid fa-history text-orange-500 mr-2"></i>বিস্তারিত ট্রিপ ইতিহাস (সকল ট্রিপ)</h4>
+                <span class="text-[10px] text-zinc-500 font-bold poppins-font" id="history-total-count">০ টি ট্রিপ</span>
+              </div>
+              <div id="completed-jobs-history-list" class="space-y-3">
+                <!-- Detailed trip log with specific shop names, commissions, and penalty details -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FIXED BOTTOM NAVIGATION BAR -->
+      <nav class="fixed-glass-nav">
+        <button id="nav-btn-find" onclick="switchDashTab('find')" class="flex flex-col items-center justify-center w-20 h-12 rounded-2xl text-orange-500 relative transition-all active:scale-90 nav-btn-active-pill">
+          <i class="fa-solid fa-compass text-base"></i>
+          <span class="text-[9px] font-bold mt-1">অর্ডার বোর্ড</span>
+        </button>
+        <button id="nav-btn-active" onclick="switchDashTab('active')" class="flex flex-col items-center justify-center w-20 h-12 rounded-2xl text-zinc-400 relative transition-all active:scale-90">
+          <i class="fa-solid fa-route text-base"></i>
+          <span class="text-[9px] font-medium mt-1">চলমান</span>
+        </button>
+        <button id="nav-btn-payouts" onclick="switchDashTab('payouts')" class="flex flex-col items-center justify-center w-20 h-12 rounded-2xl text-zinc-400 relative transition-all active:scale-90">
+          <i class="fa-solid fa-receipt text-base"></i>
+          <span class="text-[9px] font-medium mt-1">হিসাব-নিকাশ</span>
+        </button>
+      </nav>
+
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_HBGuQSh_GzqrHqHbgdaoBikLZsK3Qqs",
+      authDomain: "new-all-f99f7.firebaseapp.com",
+      databaseURL: "https://new-all-f99f7-default-rtdb.firebaseio.com",
+      projectId: "new-all-f99f7",
+      storageBucket: "new-all-f99f7.firebasestorage.app",
+      messagingSenderId: "1069748173900",
+      appId: "1:1069748173900:web:158d6336c0f4628133c8e9",
+      measurementId: "G-V6DZ37WSBF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const imgbbApiKey = "4f29b88d8207f6e762c2c852d5c895f8";
+
+    let currentRider = null;
+    let avatarUrl = "";
+    let cachedMerchants = {};
+
+    function clearAuthFields() {
+      document.getElementById('login-phone').value = "";
+      document.getElementById('login-password').value = "";
+      document.getElementById('reg-name').value = "";
+      document.getElementById('reg-phone').value = "";
+      document.getElementById('reg-details').value = "";
+      document.getElementById('reg-password').value = "";
+      avatarUrl = "";
+      document.getElementById('avatar-preview').innerHTML = `<i class="fa-solid fa-camera text-zinc-400 text-lg"></i>`;
+    }
+
+    window.toggleAuthView = function() {
+      clearAuthFields();
+      const loginBox = document.getElementById('auth-login-box');
+      const registerBox = document.getElementById('auth-register-box');
+      const toggleBtn = document.getElementById('auth-toggle-btn');
+      if (loginBox.classList.contains('hidden')) {
+        registerBox.classList.add('hidden');
+        loginBox.classList.remove('hidden');
+        toggleBtn.innerHTML = `নতুন অ্যাকাউন্ট <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i>`;
+      } else {
+        loginBox.classList.add('hidden');
+        registerBox.classList.remove('hidden');
+        toggleBtn.innerHTML = `লগইন <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i>`;
+      }
+    };
+
+    const savedRiderPhone = localStorage.getItem('chuto_rider_phone');
+    if (savedRiderPhone) {
+      get(ref(db, 'riders/' + savedRiderPhone)).then((snapshot) => {
+        if(snapshot.exists()) {
+          currentRider = snapshot.val();
+          setupDashboard();
+        } else {
+          switchPage('page-auth');
+        }
+      });
+    } else {
+      setTimeout(() => { switchPage('page-auth'); }, 1500);
+    }
+
+    window.switchPage = function(pageId) {
+      document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
+      const activeNode = document.getElementById(pageId);
+      if(activeNode) { activeNode.classList.add('active'); }
+    };
+
+    window.switchDashTab = function(tabId) {
+      document.querySelectorAll('.dash-tab-content').forEach(content => content.classList.remove('active'));
+      const activeContent = document.getElementById(`tab-${tabId}`);
+      if (activeContent) { activeContent.classList.add('active'); }
+
+      const buttons = {
+        find: document.getElementById('nav-btn-find'),
+        active: document.getElementById('nav-btn-active'),
+        payouts: document.getElementById('nav-btn-payouts')
+      };
+
+      Object.keys(buttons).forEach(key => {
+        const btn = buttons[key];
+        if (!btn) return;
+        const textSpan = btn.querySelector('span');
+        if (key === tabId) {
+          btn.className = "flex flex-col items-center justify-center w-20 h-12 rounded-2xl text-orange-500 relative transition-all duration-300 nav-btn-active-pill scale-105";
+          if (textSpan) textSpan.className = "text-[9px] font-bold mt-1";
+        } else {
+          btn.className = "flex flex-col items-center justify-center w-20 h-12 rounded-2xl text-zinc-400 relative transition-all duration-300";
+          if (textSpan) textSpan.className = "text-[9px] font-medium mt-1";
+        }
+      });
+    };
+
+    // ImgBB Profile Picture uploads [2]
+    document.getElementById('reg-avatar').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('avatar-preview').innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-orange-500 text-base"></i>`;
+      const formData = new FormData();
+      formData.append("image", file);
+      try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+        const result = await response.json();
+        if (result.success) {
+          avatarUrl = result.data.url;
+          document.getElementById('avatar-preview').innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover rounded-full">`;
+        }
+      } catch (err) {
+        Swal.fire({
+          icon: 'error',
+          title: 'আপলোড ব্যর্থ',
+          text: 'প্রোফাইল ছবি আপলোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f97316'
+        });
+      }
+    });
+
+    // Create delivery man account
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const details = document.getElementById('reg-details').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+
+      if (!name || !phone || !details || !password) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'অসম্পূর্ণ ফর্ম',
+          text: 'ডেলিভারি ড্যাশবোর্ড তৈরি করতে সবগুলো তথ্য সঠিকভাবে দিন!',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f97316'
+        });
+        return;
+      }
+      const riderRef = ref(db, 'riders/' + phone);
+      const snapshot = await get(riderRef);
+      if (snapshot.exists()) {
+        Swal.fire({
+          icon: 'error',
+          title: 'নিবন্ধন ব্যর্থ',
+          text: 'এই মোবাইল নম্বরটি ইতিমধ্যেই ডেলিভারিম্যান হিসেবে নিবন্ধিত হয়েছে।',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f97316'
+        });
+        return;
+      }
+      const newRiderData = { name, phone, details, password, status: 'active', profilePic: avatarUrl || "" };
+      await set(riderRef, newRiderData);
+      localStorage.setItem('chuto_rider_phone', phone);
+      currentRider = newRiderData;
+      clearAuthFields();
+      setupDashboard();
+    });
+
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const phone = document.getElementById('login-phone').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      if(!phone || !password) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'ইনপুট দিন',
+          text: 'মোবাইল নম্বর ও পাসওয়ার্ড প্রদান করুন।',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f97316'
+        });
+        return;
+      }
+      const snapshot = await get(ref(db, 'riders/' + phone));
+      if(snapshot.exists() && snapshot.val().password === password) {
+        currentRider = snapshot.val();
+        localStorage.setItem('chuto_rider_phone', phone);
+        clearAuthFields();
+        setupDashboard();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'ব্যর্থ',
+          text: 'আপনার মোবাইল নম্বর অথবা পাসওয়ার্ডটি সঠিক নয়!',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f43f5e'
+        });
+      }
+    });
+
+    window.logoutRider = function() {
+      localStorage.removeItem('chuto_rider_phone');
+      location.reload();
+    };
+
+    async function loadMerchantMetadata() {
+      const snapshot = await get(ref(db, 'merchants'));
+      if(snapshot.exists()) {
+        cachedMerchants = snapshot.val();
+      }
+    }
+
+    function setupDashboard() {
+      switchPage('page-dashboard');
+      switchDashTab('find');
+      
+      loadMerchantMetadata().then(() => {
+        listenToRiderStatus();
+        listenToRealtimeOrders();
+        listenToPayoutSettlementState();
+      });
+    }
+
+    // Monitor suspension states dynamically [2]
+    function listenToRiderStatus() {
+      onValue(ref(db, `riders/${currentRider.phone}`), (snap) => {
+        if(snap.exists()){
+          currentRider = snap.val();
+          document.getElementById('header-rider-name').innerText = currentRider.name;
+          
+          // Render Avatar
+          const headerAvatar = document.querySelector('header .rounded-full .overflow-hidden');
+          if (headerAvatar) {
+            headerAvatar.innerHTML = currentRider.profilePic 
+              ? `<img src="${currentRider.profilePic}" class="w-full h-full object-cover">`
+              : `<i class="fa-solid fa-user-ninja text-zinc-400 text-sm"></i>`;
+          }
+
+          // If blocked through Firebase manually, handle overlay
+          const statusSpan = document.getElementById('header-rider-status');
+          if(currentRider.status === 'suspended') {
+            statusSpan.innerText = "স্থগিত (Suspended)";
+            statusSpan.className = "text-[10px] font-extrabold block text-rose-500 animate-pulse";
+          } else {
+            statusSpan.innerText = "সক্রিয় (Active)";
+            statusSpan.className = "text-[10px] font-extrabold block text-green-400";
+          }
+        }
+      });
+    }
+
+    // Process food & grocery orders and apply BD Time strict rules
+    function listenToRealtimeOrders() {
+      const availableList = document.getElementById('available-jobs-list');
+      const activeList = document.getElementById('active-jobs-list');
+      const completedList = document.getElementById('completed-jobs-history-list');
+      const dailyAccountingList = document.getElementById('daily-accounting-breakdown-list');
+      const countBadge = document.getElementById('live-requests-badge');
+      const sound = document.getElementById('job-alert-sound');
+
+      onValue(ref(db, 'orders'), (ordersSnap) => {
+        
+        // Fetch approved settlements to calculate true past dues
+        get(ref(db, 'rider_settlements')).then((settlementsSnap) => {
+          let totalApprovedSettlements = 0;
+          if (settlementsSnap.exists()) {
+            settlementsSnap.forEach(sChild => {
+              const s = sChild.val();
+              if (s.riderId === currentRider.phone && s.status === 'approved') {
+                totalApprovedSettlements += parseFloat(s.amount || 0);
+              }
+            });
+          }
+
+          if(!ordersSnap.exists()) {
+            availableList.innerHTML = `
+              <div class="text-center py-12 space-y-3">
+                <div class="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mx-auto text-zinc-600">
+                  <i class="fa-solid fa-hourglass-empty text-2xl"></i>
+                </div>
+                <p class="text-xs text-zinc-500">বর্তমানে কোনো লাইভ অর্ডার খালি নেই।</p>
+              </div>`;
+            activeList.innerHTML = `
+              <div class="text-center py-12 space-y-3">
+                <div class="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mx-auto text-zinc-600">
+                  <i class="fa-solid fa-person-biking text-2xl"></i>
+                </div>
+                <p class="text-xs text-zinc-500">আপনার কোনো চলমান ট্রিপ নেই।</p>
+              </div>`;
+            completedList.innerHTML = `<p class="text-center text-xs text-zinc-600 py-6">কোনো কাজের ইতিহাস পাওয়া যায়নি।</p>`;
+            dailyAccountingList.innerHTML = `<p class="text-center text-xs text-zinc-600 py-6">দৈনিক হিসাব বিবরণী খালি।</p>`;
+            countBadge.innerText = "০ টি পেন্ডিং";
+            sound.pause();
+            return;
+          }
+
+          // Fetch Bangladesh Local Time
+          const bdTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dhaka"}));
+          const bdtHour = bdTime.getHours();
+
+          // Date Strings in BD Time Format
+          const todayDateStr = bdTime.toLocaleDateString("en-US", {timeZone: "Asia/Dhaka"});
+
+          let avHtml = "";
+          let actHtml = "";
+          let compHtml = "";
+          let pendingJobsCount = 0;
+          let playAlarm = false;
+
+          // Stats Accumulators
+          let todayDeliveries = 0;
+          let todayRiderEarnings = 0;
+          let todayCompanyDue = 0;
+
+          let totalDeliveries = 0;
+          let totalRiderEarnings = 0;
+          let totalCompanyDue = 0;
+
+          // Daily Groups Tracker
+          const dailyBreakdowns = {};
+
+          ordersSnap.forEach((child) => {
+            const o = child.val();
+            const merchant = cachedMerchants[o.merchantId] || { storeName: 'চিজ অ্যান্ড চিজ', location: 'বাউফল সদর' };
+
+            // Check timestamps relative to BD Time
+            const orderTime = o.timestamp ? new Date(o.timestamp) : new Date();
+            const orderBDDateStr = orderTime.toLocaleDateString("en-US", {timeZone: "Asia/Dhaka"});
+
+            // Calculate metrics for completed orders
+            if (o.status === 'completed' && o.riderId === currentRider.phone) {
+              totalDeliveries++;
+              const deliveryFee = parseFloat(o.deliveryCharge || 25);
+              const penalty = parseFloat(o.penalty || 0); // Display custom penalty if exists [2]
+              const foodBill = parseFloat(o.foodPrice || 0);
+
+              totalRiderEarnings += deliveryFee - penalty;
+              totalCompanyDue += foodBill;
+
+              // Initialize Daily Breakdowns
+              if (!dailyBreakdowns[orderBDDateStr]) {
+                dailyBreakdowns[orderBDDateStr] = {
+                  deliveries: 0,
+                  earnings: 0,
+                  companyDue: 0,
+                  dateFormatted: orderTime.toLocaleDateString("bn-BD", {
+                    timeZone: "Asia/Dhaka",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                  })
+                };
+              }
+              dailyBreakdowns[orderBDDateStr].deliveries++;
+              dailyBreakdowns[orderBDDateStr].earnings += (deliveryFee - penalty);
+              dailyBreakdowns[orderBDDateStr].companyDue += foodBill;
+
+              if (orderBDDateStr === todayDateStr) {
+                todayDeliveries++;
+                todayRiderEarnings += (deliveryFee - penalty);
+                todayCompanyDue += foodBill;
+              }
+
+              // Dynamic formatting of date for premium history list
+              const formattedDate = orderTime.toLocaleDateString("bn-BD", {
+                timeZone: "Asia/Dhaka",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+              });
+              const formattedTime = orderTime.toLocaleTimeString("en-US", {
+                timeZone: "Asia/Dhaka",
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              });
+
+              // Detailed Trip Card inside completed logs
+              compHtml += `
+                <div class="bg-[#0b0e17] border border-white/[0.04] p-4 rounded-3xl space-y-3 shadow-md relative overflow-hidden">
+                  <div class="flex justify-between items-start border-b border-white/[0.03] pb-2.5">
+                    <div>
+                      <h5 class="font-extrabold text-white text-xs flex items-center">
+                        <i class="fa-solid fa-shop text-orange-500 mr-2 text-[11px]"></i>${merchant.storeName}
+                      </h5>
+                      <span class="text-[9px] text-zinc-500 poppins-font block mt-1">ট্রিপ কোড: ${child.key.substring(1, 8).toUpperCase()}</span>
+                    </div>
+                    <span class="text-[9px] text-zinc-400 font-medium">${formattedDate} | ${formattedTime}</span>
+                  </div>
+                  
+                  <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
+                    <div class="bg-black/20 p-2 rounded-xl">
+                      <p class="text-zinc-500">কমিশন (আয়)</p>
+                      <p class="text-green-400 font-extrabold poppins-font mt-0.5">৳${deliveryFee}</p>
+                    </div>
+                    <div class="bg-black/20 p-2 rounded-xl">
+                      <p class="text-zinc-500">জরিমানা</p>
+                      <p class="${penalty > 0 ? 'text-rose-500 font-extrabold' : 'text-zinc-500'} poppins-font mt-0.5">৳${penalty}</p>
+                    </div>
+                    <div class="bg-black/20 p-2 rounded-xl">
+                      <p class="text-zinc-500">সংগৃহীত বিল</p>
+                      <p class="text-orange-400 font-bold poppins-font mt-0.5">৳${o.price}</p>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+
+            // 1. Available orders [2]
+            if(o.status === 'rider_requested') {
+              pendingJobsCount++;
+              playAlarm = true; // Ring sound on available job [2]
+              avHtml += `
+                <div class="bg-white/[0.02] border border-white/[0.06] hover:border-orange-500/30 rounded-[32px] p-5 space-y-4 shadow-xl relative overflow-hidden transition-all duration-300 pulsing-alert-card">
+                  <div class="flex justify-between items-center border-b border-white/[0.04] pb-3">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500"><i class="fa-solid fa-utensils text-xs"></i></div>
+                      <span class="font-extrabold text-sm text-white">${merchant.storeName}</span>
+                    </div>
+                    <span class="bg-orange-500 text-white text-[8px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-widest animate-pulse">নতুন রিকোয়েস্ট</span>
+                  </div>
+                  
+                  <div class="relative pl-6 space-y-3.5 text-xs">
+                    <div class="absolute left-2.5 top-1 bottom-1 w-[1.5px] border-l border-dashed border-zinc-700"></div>
+                    <div class="relative">
+                      <span class="absolute -left-[19px] top-0.5 w-2.5 h-2.5 rounded-full bg-orange-500 ring-4 ring-orange-500/10"></span>
+                      <p class="text-[9px] uppercase font-bold text-zinc-500">পিকআপ এড্রেস</p>
+                      <p class="text-zinc-300 font-medium">${merchant.location || 'বাউফল সদর'}</p>
+                    </div>
+                    <div class="relative">
+                      <span class="absolute -left-[19px] top-0.5 w-2.5 h-2.5 rounded-full bg-blue-500 ring-4 ring-blue-500/10"></span>
+                      <p class="text-[9px] uppercase font-bold text-zinc-500">ডেলিভারি গন্তব্য</p>
+                      <p class="text-zinc-300 font-medium">${o.address}</p>
+                    </div>
+                  </div>
+
+                  <div class="bg-black/30 p-3.5 rounded-2xl border border-white/[0.04] text-xs">
+                    <p class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider mb-1.5">আইটেম বিবরণী</p>
+                    <p class="text-white font-medium mb-3">${o.itemName}</p>
+                    
+                    <div class="grid grid-cols-2 gap-2 border-t border-white/[0.04] pt-2.5">
+                      <div class="text-center border-r border-white/[0.04]">
+                        <p class="text-zinc-500 text-[9px]">ডেলিভারি ফি (আয়)</p>
+                        <p class="font-extrabold text-green-400 text-base poppins-font">৳${o.deliveryCharge || 25}</p>
+                      </div>
+                      <div class="text-center">
+                        <p class="text-zinc-500 text-[9px]">ক্যাশ কালেকশন</p>
+                        <p class="font-extrabold text-orange-500 text-base poppins-font">৳${o.price}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button onclick="acceptDeliveryJob('${child.key}')" class="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:opacity-95 text-white font-extrabold py-3.5 rounded-2xl text-xs active:scale-95 transition-all shadow-lg shadow-orange-500/10">অর্ডারটি একসেপ্ট করুন (Claim)</button>
+                </div>
+              `;
+            }
+
+            // 2. Active orders [2]
+            if(o.riderId === currentRider.phone && (o.status === 'rider_accepted' || o.status === 'shipping')) {
+              const step1 = "active";
+              const step2 = o.status === 'shipping' ? "active" : "";
+              const line = o.status === 'shipping' ? "active" : "";
+
+              actHtml += `
+                <div class="bg-white/[0.02] border border-white/[0.06] rounded-[32px] p-5 space-y-5 shadow-2xl relative overflow-hidden">
+                  <div class="flex justify-between items-center border-b border-white/[0.04] pb-3">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fa-solid fa-route text-xs"></i></div>
+                      <span class="font-extrabold text-sm text-white">${merchant.storeName}</span>
+                    </div>
+                    <span class="bg-blue-500/10 text-blue-400 text-[9px] font-extrabold px-3 py-1 rounded-full border border-blue-500/20">চলমান ট্রিপ</span>
+                  </div>
+
+                  <div class="space-y-3 bg-black/20 p-4 rounded-2xl border border-white/[0.04]">
+                    <p class="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">ডেলিভারি প্রোগ্রেস ট্র্যাকিং</p>
+                    <div class="flex items-center justify-between text-center px-2">
+                      <div class="flex flex-col items-center">
+                        <span class="w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-bold ${step1 === 'active' ? 'bg-orange-500 text-white' : 'bg-zinc-800 text-zinc-500'} transition-all"><i class="fa-solid fa-check"></i></span>
+                        <span class="text-[8px] mt-1 font-bold ${step1 === 'active' ? 'text-orange-400' : 'text-zinc-500'}">গৃহীত</span>
+                      </div>
+                      <div class="stepper-line ${line ? 'bg-orange-500' : 'bg-zinc-800'} h-[2px] flex-grow mx-2"></div>
+                      <div class="flex flex-col items-center">
+                        <span class="w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-bold ${step2 === 'active' ? 'bg-orange-500 text-white' : 'bg-zinc-800 text-zinc-500'} transition-all">${step2 === 'active' ? '<i class="fa-solid fa-truck-fast"></i>' : '২'}</span>
+                        <span class="text-[8px] mt-1 font-bold ${step2 === 'active' ? 'text-orange-400' : 'text-zinc-500'}">পিকড-আপ</span>
+                      </div>
+                      <div class="stepper-line bg-zinc-800 h-[2px] flex-grow mx-2"></div>
+                      <div class="flex flex-col items-center">
+                        <span class="w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-bold bg-zinc-800 text-zinc-500"><i class="fa-solid fa-house"></i></span>
+                        <span class="text-[8px] mt-1 font-bold text-zinc-500">ডেলিভারড</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="text-xs space-y-3">
+                    <div class="bg-[#0b0d16] p-4 rounded-2xl space-y-2.5 border border-white/[0.02]">
+                      <div class="flex justify-between">
+                        <span class="text-zinc-500">আইটেম বিবরণী:</span>
+                        <span class="text-white font-medium">${o.itemName}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-zinc-500">পিকআপ রোড:</span>
+                        <span class="text-white font-medium">${merchant.location || 'বাউফল'}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-zinc-500">কাস্টমার ঠিকানা:</span>
+                        <span class="text-white font-medium">${o.address}</span>
+                      </div>
+                      <div class="flex justify-between items-center border-t border-white/[0.04] pt-2 mt-2">
+                        <span class="text-zinc-500">কাস্টমার ফোন:</span>
+                        <a href="tel:${o.userPhone}" class="flex items-center space-x-1.5 text-green-400 font-bold poppins-font bg-green-500/10 px-3 py-1.5 rounded-xl border border-green-500/20 active:scale-95 transition-all">
+                          <i class="fa-solid fa-phone"></i>
+                          <span>কল করুন</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="bg-black/40 p-4 rounded-2xl border border-white/[0.04] text-[11px] space-y-2 font-sans">
+                      <div class="flex justify-between">
+                        <span class="text-zinc-500">খাবারের মূল্য (বকেয়া):</span>
+                        <span class="text-white font-bold poppins-font">৳${o.foodPrice}</span>
+                      </div>
+                      <div class="flex justify-between text-green-400">
+                        <span>ডেলিভারি চার্জ (আয়):</span>
+                        <span class="font-bold poppins-font">৳${o.deliveryCharge || 25}</span>
+                      </div>
+                      <div class="flex justify-between font-extrabold text-white border-t border-white/[0.04] pt-2 mt-1 text-xs">
+                        <span>মোট সংগ্রহ বিল:</span>
+                        <span class="text-orange-400 poppins-font text-sm">৳${o.price}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex space-x-2 pt-1">
+                    ${o.status === 'rider_accepted' ? `
+                      <button onclick="updateDeliveryStep('${child.key}', 'shipping')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-2xl text-xs active:scale-95 transition-all shadow-md">পিকআপ সম্পন্ন করুন</button>
+                    ` : `
+                      <button onclick="markDeliveryAsComplete('${child.key}', ${o.foodPrice})" class="w-full bg-green-600 hover:bg-green-700 text-white font-extrabold py-3.5 rounded-2xl text-xs active:scale-95 transition-all shadow-md">ডেলিভারি ও ক্যাশ কালেকশন সম্পূর্ণ</button>
+                    `}
+                  </div>
+                </div>
+              `;
+            }
+          });
+
+          // Sound control
+          if(playAlarm && currentRider.status !== 'suspended') {
+            sound.play().catch(() => {});
+          } else {
+            sound.pause();
+            sound.currentTime = 0;
+          }
+
+          // RENDER UPDATED METRICS ON HOME TAB
+          document.getElementById('home-today-count').innerText = `${todayDeliveries} টি ট্রিপ`;
+          document.getElementById('home-today-earnings').innerText = `৳${todayRiderEarnings} আয়`;
+
+          // RENDER METRICS ON PAYOUTS TAB
+          document.getElementById('stat-total-count').innerText = totalDeliveries + " টি";
+          document.getElementById('stat-total-earnings').innerText = "৳" + totalRiderEarnings;
+          
+          // Calculate Net Outstanding Due = Total Completed Food Prices - Approved Settlement Payments
+          const netOutstandingDue = totalCompanyDue - totalApprovedSettlements;
+          const adjustedNetDue = netOutstandingDue > 0 ? netOutstandingDue : 0;
+          document.getElementById('stat-company-due').innerText = "৳" + adjustedNetDue;
+          document.getElementById('pay-amount').value = adjustedNetDue;
+
+          document.getElementById('history-total-count').innerText = `${totalDeliveries} টি ট্রিপ`;
+
+          // RENDER DAILY ACCOUNTING BREAKDOWN
+          let dailyHtml = "";
+          Object.keys(dailyBreakdowns).sort((a, b) => new Date(b) - new Date(a)).forEach(dateKey => {
+            const day = dailyBreakdowns[dateKey];
+            dailyHtml += `
+              <div class="bg-white/[0.02] border border-white/[0.04] p-4 rounded-2xl flex justify-between items-center text-xs">
+                <div>
+                  <p class="font-extrabold text-white text-[12px]">${day.dateFormatted}</p>
+                  <p class="text-[10px] text-zinc-500 poppins-font mt-0.5">সম্পন্ন: ${day.deliveries} টি ট্রিপ</p>
+                </div>
+                <div class="text-right space-y-0.5">
+                  <span class="text-green-400 font-extrabold block poppins-font">আয়: ৳${day.earnings}</span>
+                  <span class="text-amber-400 font-bold block text-[10px] poppins-font">কোম্পানি বকেয়া: ৳${day.companyDue}</span>
+                </div>
+              </div>
+            `;
+          });
+          dailyAccountingList.innerHTML = dailyHtml ? dailyHtml : `<p class="text-center text-xs text-zinc-600 py-6">দৈনিক হিসাব বিবরণী খালি।</p>`;
+
+          // STRICT BANNER & AUTO-LOCKING CHECKS (BANGLADESH TIME)
+          const warningBanner = document.getElementById('custom-time-warning-banner');
+          const suspendedBanner = document.getElementById('suspended-overlay');
+          const boardLockShield = document.getElementById('board-lock-shield');
+          const activeLockShield = document.getElementById('active-lock-shield');
+
+          // Reset visibility
+          warningBanner.classList.add('hidden');
+          suspendedBanner.classList.add('hidden');
+          boardLockShield.classList.add('hidden');
+          activeLockShield.classList.add('hidden');
+
+          // 1. Unpaid Past Dues = Net Company Due - Today's Company Due
+          const unpaidPastDues = netOutstandingDue - todayCompanyDue;
+
+          // RULE A: Unpaid Past Dues (From Yesterday or older) exist and deadline has passed.
+          // Since it's a new day, any unpaid past due means yesterday's 9 PM deadline is already breached.
+          if (unpaidPastDues > 0 || currentRider.status === 'suspended') {
+            suspendedBanner.classList.remove('hidden');
+            boardLockShield.classList.remove('hidden');
+            activeLockShield.classList.remove('hidden');
+          } 
+          // RULE B: Strict Today's Deadline Checks
+          else if (todayCompanyDue > 0) {
+            // Warn during today's 8:00 PM to 9:00 PM window
+            if (bdtHour >= 20 && bdtHour < 21) {
+              warningBanner.classList.remove('hidden');
+            }
+            // Auto lock after today's 9:00 PM (21:00) if not paid
+            else if (bdtHour >= 21) {
+              suspendedBanner.classList.remove('hidden');
+              boardLockShield.classList.remove('hidden');
+              activeLockShield.classList.remove('hidden');
+            }
+          }
+
+          countBadge.innerText = `${pendingJobsCount} টি পেন্ডিং`;
+          availableList.innerHTML = avHtml ? avHtml : `
+            <div class="text-center py-16 space-y-3">
+              <div class="w-16 h-16 rounded-full bg-zinc-900/50 flex items-center justify-center mx-auto text-zinc-700">
+                <i class="fa-solid fa-hourglass text-2xl"></i>
+              </div>
+              <p class="text-xs text-zinc-500">বর্তমানে কোনো লাইভ অর্ডার খালি নেই।</p>
+            </div>`;
+            
+          activeList.innerHTML = actHtml ? actHtml : `
+            <div class="text-center py-16 space-y-3">
+              <div class="w-16 h-16 rounded-full bg-zinc-900/50 flex items-center justify-center mx-auto text-zinc-700">
+                <i class="fa-solid fa-circle-check text-2xl"></i>
+              </div>
+              <p class="text-xs text-zinc-500">আপনার কোনো চলমান ট্রিপ নেই।</p>
+            </div>`;
+            
+          completedList.innerHTML = compHtml ? compHtml : `
+            <div class="text-center py-8 text-xs text-zinc-600">
+              কোনো কাজের ইতিহাস পাওয়া যায়নি।
+            </div>`;
+
+        });
+      });
+    }
+
+    // Competitive Locking: first click wins assignment check [2]
+    window.acceptDeliveryJob = async function(orderId) {
+      const snapStatus = await get(ref(db, `riders/${currentRider.phone}/status`));
+      if(snapStatus.val() === 'suspended') {
+        Swal.fire({
+          icon: 'error',
+          title: 'অ্যাকাউন্ট স্থগিত!',
+          text: 'কোম্পানি বকেয়া পরিশোধ না করার কারণে আপনার অ্যাকাউন্ট লক করা হয়েছে। হিসাব-নিকাশ অপশনে গিয়ে পরিশোধ করুন।',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f43f5e'
+        });
+        return;
+      }
+
+      // Live locking check to avoid double booking
+      const snap = await get(ref(db, `orders/${orderId}/status`));
+      if (snap.val() !== 'rider_requested') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'দুঃখিত!',
+          text: 'এই অর্ডারটি অন্য একজন রাইডার ইতিমধ্যেই গ্রহণ করে ফেলেছেন।',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f97316'
+        });
+        return;
+      }
+
+      await update(ref(db, `orders/${orderId}`), {
+        status: 'rider_accepted',
+        riderId: currentRider.phone,
+        riderName: currentRider.name,
+        riderPhone: currentRider.phone
+      });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'অর্ডারটি সফলভাবে গৃহীত!',
+        text: 'খাবার সংগ্রহ করতে দ্রুত রেস্টুরেন্টে যাত্রা করুন।',
+        background: '#0d111d',
+        color: '#ffffff',
+        confirmButtonColor: '#10b981'
+      });
+      switchDashTab('active');
+    };
+
+    window.updateDeliveryStep = async function(orderId, nextState) {
+      await update(ref(db, `orders/${orderId}`), { status: nextState });
+      Swal.fire({
+        icon: 'info',
+        title: 'পিকআপ সম্পন্ন',
+        text: 'অর্ডারের খাবারটি আপনার হেফাজতে নেওয়া হয়েছে। গ্রাহকের ঠিকানায় রওনা হন!',
+        background: '#0d111d',
+        color: '#ffffff',
+        confirmButtonColor: '#2563eb'
+      });
+    };
+
+    window.markDeliveryAsComplete = async function(orderId, foodPrice) {
+      Swal.fire({
+        title: 'ডেলিভারি সম্পন্ন?',
+        text: `আপনি কি গ্রাহক থেকে মোট বিল সংগ্রহ করে খাবার বুঝিয়ে দিয়েছেন?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#1e293b',
+        confirmButtonText: 'হ্যাঁ, সম্পন্ন হয়েছে',
+        cancelButtonText: 'বাতিল',
+        background: '#0d111d',
+        color: '#ffffff'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await update(ref(db, `orders/${orderId}`), { 
+            status: 'completed',
+            completedAt: Date.now() 
+          });
+          Swal.fire({
+            icon: 'success',
+            title: 'অভিনন্দন!',
+            text: 'ডেলিভারি সফলভাবে সম্পন্ন। আপনার ২৫ টাকা আর্নিং ব্যালেন্সে যোগ হয়েছে!',
+            background: '#0d111d',
+            color: '#ffffff',
+            confirmButtonColor: '#10b981'
+          });
+        }
+      });
+    };
+
+    window.copyPaymentNumber = function() {
+      const num = document.getElementById('admin-payment-number').innerText;
+      navigator.clipboard.writeText(num);
+      Swal.fire({
+        icon: 'success',
+        title: 'কপি সম্পন্ন',
+        text: 'বিকাশ নম্বরটি ক্লিপবোর্ডে কপি করা হয়েছে।',
+        background: '#0d111d',
+        color: '#ffffff',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    };
+
+    function listenToPayoutSettlementState() {
+      const statusBadge = document.getElementById('settlement-status-badge');
+      onValue(ref(db, 'rider_settlements'), (snap) => {
+        if(!snap.exists()) {
+          statusBadge.innerText = "কোনো সাবমিশন নেই";
+          statusBadge.className = "bg-zinc-900 text-zinc-500 text-[8px] font-bold px-2.5 py-1 rounded-full border border-white/[0.06]";
+          return;
+        }
+
+        let lastSub = null;
+        snap.forEach(child => {
+          const s = child.val();
+          if (s.riderId === currentRider.phone) {
+            lastSub = s;
+          }
+        });
+
+        if(lastSub) {
+          if (lastSub.status === 'pending') {
+            statusBadge.innerText = "অনুমোদন পেন্ডিং";
+            statusBadge.className = "bg-amber-500/10 text-amber-400 text-[8px] font-bold px-2.5 py-1 rounded-full border border-amber-500/20";
+          } else if (lastSub.status === 'approved') {
+            statusBadge.innerText = "অনুমোদিত (Approved)";
+            statusBadge.className = "bg-green-500/10 text-green-400 text-[8px] font-bold px-2.5 py-1 rounded-full border border-green-500/20";
+          }
+        }
+      });
+    }
+
+    window.submitDailySettlement = async function() {
+      const amount = document.getElementById('pay-amount').value.trim();
+      const sender = document.getElementById('pay-sender').value.trim();
+      const txid = document.getElementById('pay-txid').value.trim();
+
+      if(!amount || parseFloat(amount) <= 0 || sender.length < 11 || !sender.startsWith('01') || !txid) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'অসম্পূর্ণ পেমেন্ট তথ্য',
+          text: 'বকেয়া পরিশোধের পরিমাণ, সঠিক সেন্ডার বিকাশ নম্বর এবং ট্রানজেকশন আইডি দিন।',
+          background: '#0d111d',
+          color: '#ffffff',
+          confirmButtonColor: '#f97316'
+        });
+        return;
+      }
+
+      const settlementId = push(ref(db, 'rider_settlements')).key;
+      await set(ref(db, 'rider_settlements/' + settlementId), {
+        riderId: currentRider.phone,
+        riderName: currentRider.name,
+        amount: parseFloat(amount),
+        senderPhone: sender,
+        txId: txid,
+        status: 'pending',
+        timestamp: Date.now()
+      });
+
+      Swal.fire({
+        title: 'পেমেন্ট সাবমিট হয়েছে!',
+        text: 'আপনার বকেয়া পরিশোধের হিসাবটি সফলভাবে সাবমিট করা হয়েছে। এডমিন ভেরিফাই করে অ্যাপ্রুভ করবেন।',
+        icon: 'success',
+        confirmButtonText: 'ঠিক আছে',
+        confirmButtonColor: '#ea580c',
+        background: '#0d111d',
+        color: '#ffffff'
+      });
+
+      document.getElementById('pay-sender').value = "";
+      document.getElementById('pay-txid').value = "";
+    };
+
+  </script>
+</body>
+</html>
